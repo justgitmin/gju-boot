@@ -1239,6 +1239,7 @@
             if (isSyncing || !auth.currentUser) return;
             const state = {};
             document.querySelectorAll('#view-schedule select, #view-schedule input').forEach((el, i) => {
+                if (el.classList.contains('date-input')) return;
                 state[`f_${i}`] = el.value;
             });
             try { await setDoc(docRef, state); } catch(e) { console.error(e); }
@@ -1249,9 +1250,10 @@
             document.querySelectorAll('#view-schedule select, #view-schedule input').forEach((el, i) => {
                 const v = data[`f_${i}`];
                 if (v !== undefined && el.value !== v) {
+                    // date-input은 복원하지 않음 (날짜는 고정값)
+                    if (el.classList.contains('date-input')) return;
                     el.value = v;
                     if (el.tagName === 'SELECT') window.updateSelectColor && window.updateSelectColor(el);
-                    if (el.classList.contains('date-input') && window.updateRowStyle) window.updateRowStyle(el);
                 }
             });
             window.updateAllocationStatus && window.updateAllocationStatus();
