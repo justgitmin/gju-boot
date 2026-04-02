@@ -518,7 +518,7 @@
 
     <!-- 로컬 전용 자바스크립트 -->
     <script>
-        // === Toast Notification ===
+        // === Global Functions ===
         window.showToast = function(message, type = 'warning') {
             const toast = document.getElementById('toast-message');
             const icon = document.getElementById('toast-icon');
@@ -537,27 +537,29 @@
             }
 
             setTimeout(() => {
-                toast?.classList?.replace('opacity-100', 'opacity-0');
-                toast?.classList?.replace('translate-y-0', '-translate-y-4');
-                toast?.classList?.add('pointer-events-none');
+                toast.classList.replace('opacity-100', 'opacity-0');
+                toast.classList.replace('translate-y-0', '-translate-y-4');
+                toast.classList.add('pointer-events-none');
             }, 3000);
         };
 
-        function showWarningToast(courseName, max) {
+        window.showWarningToast = function(courseName, max) {
             const cleanName = courseName.split('(')[0];
             window.showToast(`${cleanName} 과정은 최대 ${max}일까지만 배정 가능합니다!`, 'warning');
-        }
+        };
 
-        // View Switcher
         window.switchView = function(viewId) {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn?.classList?.remove('active'));
-            document.getElementById(`nav-${viewId}`)?.classList?.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`nav-${viewId}`);
+            if(activeBtn) activeBtn.classList.add('active');
 
             document.querySelectorAll('.view-section').forEach(view => {
-                view?.classList?.remove('active');
+                view.classList.remove('active');
             });
+            
             setTimeout(() => {
-                document.getElementById(`view-${viewId}`)?.classList?.add('active');
+                const activeView = document.getElementById(`view-${viewId}`);
+                if(activeView) activeView.classList.add('active');
             }, 10);
 
             if (viewId === 'detail') {
@@ -568,14 +570,183 @@
             }
         };
 
-        // 데이터 및 색상 명시적 매핑 (Tailwind JIT 누락 방지)
-        const colorMappings = {
-            indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-600', lightBg: 'bg-indigo-100', lightText: 'text-indigo-800', lightBorder: 'border-indigo-200', check: 'text-indigo-500', active: ['bg-indigo-600', 'text-white', 'border-indigo-600', 'transform', 'scale-[1.02]'] },
-            blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-600', lightBg: 'bg-blue-100', lightText: 'text-blue-800', lightBorder: 'border-blue-200', check: 'text-blue-500', active: ['bg-blue-600', 'text-white', 'border-blue-600', 'transform', 'scale-[1.02]'] },
-            emerald: { bg: 'bg-emerald-600', text: 'text-emerald-600', border: 'border-emerald-600', lightBg: 'bg-emerald-100', lightText: 'text-emerald-800', lightBorder: 'border-emerald-200', check: 'text-emerald-500', active: ['bg-emerald-600', 'text-white', 'border-emerald-600', 'transform', 'scale-[1.02]'] },
-            rose: { bg: 'bg-rose-600', text: 'text-rose-600', border: 'border-rose-600', lightBg: 'bg-rose-100', lightText: 'text-rose-800', lightBorder: 'border-rose-200', check: 'text-rose-500', active: ['bg-rose-600', 'text-white', 'border-rose-600', 'transform', 'scale-[1.02]'] }
+        // === Curriculum Data (Clean JSON format) ===
+        const curriculumData = {
+            'common': {
+                title: '공통(초급)',
+                color: 'indigo',
+                courses: [
+                    {
+                        name: '[1학기] 프롬프트엔지니어링(몰입) [15H]',
+                        goal: '생성형 AI의 원리를 이해하고, 목적에 맞는 프롬프트를 작성하여 실무와 학습에 AI를 200% 활용하는 방법을 습득합니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 AI 현황 이해, 계정 생성', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'AI는 어떻게 대답하는가? (LLM 원리 쉽게 이해)', method: '강의/퀴즈 (오프라인)' }, { time: '3교시 (1H)', content: 'AI vs 사람 답변 비교 실습, 정리 및 성찰일지 작성', method: '모둠/개인 (오프라인)' } ] },
+                            { day: '2일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '전일 복습, 나쁜 프롬프트 사례 분석 및 3요소(명확성/구체성/맥락) 학습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '같은 목적, 다른 프롬프트 적용 및 결과 비교 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '프롬프트 개선 챌린지(짝 활동), OX 퀴즈 형성평가 및 정리', method: '협동학습 (오프라인)' } ] },
+                            { day: '3일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: 'Role Prompting(역할 부여) 및 Context Prompting(배경 정보 제공)', method: '이론/실습 (온라인)' }, { time: '2교시 (1H)', content: 'Format Prompting: 원하는 템플릿 양식으로 출력 형식 지정하기', method: '이론/실습 (온라인)' }, { time: '3교시 (1H)', content: 'Chain-of-Thought(단계별 사고 유도) 실습 및 온라인 퀴즈 제출', method: '이론/평가 (온라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '활용 시나리오(학업/취업/창작/업무) 소개 및 시나리오별 프롬프트 작성 실습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '모둠별 최고의 프롬프트 선정 및 결과물 개선 논의', method: '모둠활동 (오프라인)' }, { time: '3교시 (1H)', content: '개선된 프롬프트 모둠 발표, 상호 피드백 및 다음 차시 안내', method: '발표/평가 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '프롬프트 북 개념 및 구조 안내, 나만의 프롬프트 북 제작 돌입', method: '강의/제작 (오프라인)' }, { time: '2교시 (1H)', content: '분야별 10개 이상의 프롬프트를 담은 프롬프트 북 문서 완성', method: '개인제작 (오프라인)' }, { time: '3교시 (1H)', content: '결과물 발표, 동료/강사 피드백, 우수작 공유 및 최종 성찰일지 작성', method: '발표/평가 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[2학기] AI 디자인 씽킹(몰입) [15H]',
+                        goal: '사용자 중심의 문제 해결 방법론인 디자인 씽킹에 AI 도구를 접목하여 기획력과 창의적 문제 해결 능력을 기릅니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 팀 빌딩, 문제 해결을 위한 공감(Empathize) 기초 실습', method: '토의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '타겟 사용자 분석 및 주변의 일상 문제 발굴 브레인스토밍', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '협업 툴(Miro) 환경 세팅 안내 및 가상 인터뷰 챗봇 테스트', method: '실습안내 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '디자인 씽킹 5단계 프로세스의 직관적 이해 및 이론', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: 'AI 기술이 바꾼 최신 서비스 기획 및 프로토타이핑 트렌드 분석', method: '사례연구 (온라인)' }, { time: '3교시 (1H)', content: '데이터 수집 방법론 및 타겟 고객 여정 지도(CJ)의 중요성 파악', method: '이론/퀴즈 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '사용자 경험 매핑: 고객 여정 지도(Customer Journey Map) 뼈대 잡기', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'weeai 생성 데이터를 반영한 여정 내 Pain-point 구체화', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Miro를 활용한 조별 고객 여정 지도 시각화 및 발표', method: '조별실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '아이디에이션(Ideation): 문제를 해결할 다양한 아이디어 발산', method: '브레인스토밍 (오프라인)' }, { time: '2교시 (1H)', content: '실현 가능성과 임팩트 매트릭스를 활용한 핵심 아이디어 선정', method: '토의/실습 (오프라인)' }, { time: '3교시 (1H)', content: '최소 기능 제품(MVP) 및 프로토타입 기초 스토리보드 작성', method: '조별실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AI 프로토타이핑 도구(Miro, v0.dev 등)를 활용한 MVP 스케치', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '사용자 시나리오를 바탕으로 프로토타입 디자인 완성', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '조별 디자인 씽킹 결과물(MVP) 최종 시연 및 상호 피드백', method: '발표/평가 (오프라인)' } ] }
+                        ]
+                    }
+                ]
+            },
+            'data': {
+                title: 'AI 데이터SW(컴공)',
+                color: 'blue',
+                courses: [
+                    {
+                        name: '[1학기] 클라우드입문 (몰입) [15H]',
+                        goal: '클라우드 컴퓨팅의 기본 개념을 이해하고, AWS 핵심 서비스(EC2, S3 등)를 직접 다루며 인프라 구축의 기초를 다집니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 실습을 위한 AWS Educate/프리티어 계정 생성', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'AWS 콘솔 대시보드 화면 구성 파악 및 보안(MFA) 기본 세팅', method: '시연/실습 (오프라인)' }, { time: '3교시 (1H)', content: '가상머신(EC2) 개념 맛보기 및 나만의 첫 EC2 인스턴스 생성 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '클라우드 컴퓨팅(IaaS, PaaS, SaaS)의 개념 완벽 이해', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '온프레미스와 클라우드 인프라의 결정적 차이와 경제성 파악', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: 'AWS 글로벌 인프라(리전, 가용영역) 및 핵심 서비스 라인업 소개', method: '이론/퀴즈 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '클라우드 보안의 핵심: IAM(Identity and Access Management) 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '생성한 EC2 인스턴스에 SSH 클라이언트를 이용한 원격 접속', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '리눅스(Linux) 기초 명령어 실습 및 기본 웹 서버 구동 확인', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '무제한 저장소 AWS S3 객체 스토리지 버킷 생성 및 권한 설정', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '간단한 정적 웹 페이지(HTML/CSS) 작성 및 S3 파일 업로드', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'S3 정적 웹사이트 호스팅 기능을 이용해 내 페이지 인터넷 퍼블리싱', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '독립된 가상 네트워크(VPC, 서브넷, 인터넷 게이트웨이) 구축 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '새로운 VPC 안에 EC2를 배치하고 방화벽(보안 그룹) 규칙 세밀하게 조정', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '비용 폭탄 방지(Billing 알람) 설정 및 CloudWatch 기초 모니터링', method: '마무리/평가 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[1학기] ML/딥러닝 기초 [15H]',
+                        goal: '수식 없이 직관적인 노코드/로우코드 툴을 활용하여 머신러닝/딥러닝 모델의 학습 원리와 데이터 분석 기초를 체험합니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 인공지능의 학습 방식(강아지/고양이 구별법) 시연', method: '강의/시연 (오프라인)' }, { time: '2교시 (1H)', content: '구글 티처블 머신(Teachable Machine) UI 접속 및 웹캠 연동 셋팅', method: '실습안내 (오프라인)' }, { time: '3교시 (1H)', content: '웹캠 활용 가위/바위/보 객체 이미지 수집, 학습 및 실시간 분류 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '인공지능, 머신러닝, 딥러닝의 명확한 차이와 발전 역사', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '지도학습(정답이 있는)과 비지도학습(정답이 없는) 알고리즘 분류', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '머신러닝의 양대 산맥: 분류(Classification)와 회귀(Regression)의 차이', method: '이론/퀴즈 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AI가 공부하는 책, 데이터 셋(Train, Validation, Test) 분할 개념', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '과적합(Overfitting) 방지 및 모델 평가 지표(정확도 등) 기초', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '학습된 모델의 정확도 테스트 및 인식률 저하(한계점) 체험 개선 실습', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코딩 없는 데이터 분석 툴, Orange Data Mining 설치 및 노드 연결 방식 파악', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '엑셀(CSV) 데이터셋 불러오기 및 Data Table 노드를 통한 원시 데이터 구조 확인', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Scatter Plot 등 시각화 노드를 활용해 데이터 피처간 연관성 흐름 파악하기', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '의사결정나무(Decision Tree) 노드 연결을 통한 타겟 값(생존/사망 등) 예측 모델 생성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '타이타닉 생존자 데이터를 직접 분석하고, 내가 살 수 있었을지 예측 테스트', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Confusion Matrix 노드로 내 모델의 성적표(정확도) 도출 및 데이터 분석 과정 랩업', method: '마무리/평가 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[1학기] LLM 애플리케이션(몰입) [30H]',
+                        goal: '파이썬 기초 문법을 익히고, weeai 및 OpenAI API 연동하여 나만의 맞춤형 AI 챗봇(RAG)과 웹 서비스를 개발합니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 구글 코랩(Colab) 환경 구성, 단축키 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'API 개념 직관적 이해 및 weeai/OpenAI API Key 발급, 환경변수 보안 세팅', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 기본 입출력(print)으로 첫 코드 실행해보고 터미널 챗봇 뼈대 맛보기', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '파이썬 데이터의 그릇, 변수와 기본 데이터 타입 파악', method: '온라인실습' }, { time: '2교시 (1H)', content: '상황에 따라 다른 길로 가는 if, elif, else 조건문 문법 기초', method: '온라인실습' }, { time: '3교시 (1H)', content: '데이터를 묶어서 관리하는 파이썬 리스트(List)와 딕셔너리 구조', method: '온라인실습' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코드를 반복해서 실행해주는 for 문과 while 문의 문법 구조', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '자주 쓰는 코드를 하나로 묶는 함수(Function) 정의 및 매개변수', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 외부 모듈과 라이브러리(import) 활용의 이해', method: '이론/실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '인터넷 통신 프로토콜(HTTP) 기초와 GET/POST 방식의 차이', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: 'REST API 데이터 규격인 JSON 포맷의 구조 분석 및 파싱(Parsing) 이론', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 `requests` 라이브러리를 활용한 HTTP POST 요청 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'LLM API를 호출하여 질문 전송하고 답변 받아보기 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '복잡한 JSON 응답 데이터에서 실제 AI의 텍스트 답변 내용만 추출(파싱)하기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '터미널 콘솔창에서 1회성 질문/답변이 구동되는 파이썬 스크립트 작성', method: '개인실습 (오프라인)' } ] },
+                            { day: '6일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '리스트/딕셔너리를 활용하여 챗봇의 이전 대화 기록(Memory/Context)을 저장하는 로직 구현', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '무한 반복(while True) 문을 결합하여 대화가 끊기지 않는 콘솔 채팅 앱 완성', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '시스템(System) 프롬프트를 변수로 처리하여 챗봇에 페르소나(예: 다정한 선생님) 입히기', method: '개인실습 (오프라인)' } ] },
+                            { day: '7일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '할루시네이션(거짓말)을 잡는 RAG(검색 증강 생성) 아키텍처 개요 및 작동 원리 이해', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '텍스트 분할(Chunking)과 자연어를 숫자로 바꾸는 임베딩(Embedding)의 기초 원리', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: '벡터 데이터베이스(Vector DB)의 역할 및 내 문서 업로드, 유사도 검색 맛보기', method: '개인실습 (오프라인)' } ] },
+                            { day: '8일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'weeai 플랫폼을 활용한 나만의 문서 기반 RAG 파이프라인 셋팅', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '문서에서 검색된 문맥(Context)을 조합하여 LLM에 전달하는 RAG 프롬프트 작성 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '"문서에 없는 내용은 모른다고 답해" 등 할루시네이션 방지 방어 로직 적용 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '9일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '웹 개발 지식 없이 파이썬만으로 웹을 만드는 프레임워크(Streamlit) 개요 및 설치', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Streamlit 텍스트 출력, 입력 폼(Input), 버튼 등 기본 웹 화면 UI 컴포넌트 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '작성해둔 터미널 챗봇 API 로직을 Streamlit의 Submit 버튼 이벤트에 연결하여 웹 전환', method: '개인실습 (오프라인)' } ] },
+                            { day: '10일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Streamlit chat_message UI 컴포넌트를 활용한 대화창 렌더링', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '완성된 내 문서 기반 AI 웹 챗봇 전체 구동 테스트, 에러 디버깅 및 코드 최적화', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Streamlit Cloud(무료)를 활용한 퍼블릭 웹 서비스 배포 시연 및 프로젝트 랩업', method: '발표/배포 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[2학기] NHN/AWS 멀티 클라우드 운영(몰입) [15H]',
+                        goal: '국내 클라우드 환경(NHN Cloud)과 글로벌 인프라(AWS)를 비교 실습하며 멀티 클라우드 아키텍처 운영 감각을 익힙니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 NHN Cloud 콘솔 접속, 프로젝트 생성 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '나만의 프라이빗 네트워크(VPC) 및 서브넷 기초 뼈대 구성 맛보기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '방화벽(보안 그룹) 기본 세팅 및 인터넷 게이트웨이 연동 실습', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: 'K-클라우드 산업 동향 및 공공/금융/의료 망 분리 클라우드 도입 요건 파악', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 주요 인프라 아키텍처 및 AWS 서비스(EC2, S3 등)와의 1:1 용어 비교', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '가용 영역(AZ) 이중화 및 클라우드 네트워크 라우팅(Routing) 기본 이론 복습', method: '이론/퀴즈 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '구성해둔 NHN Cloud VPC 내부에 가상 인스턴스(서버) 스펙 산정 및 다중 생성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '원격 접속용 키페어(Keypair) 관리 및 플로팅 IP 할당하여 접속하기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '서버 환경에 기본 웹 서버(Nginx) 패키지 설치하고 외부에서 IP 접속 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '서버 트래픽 폭주 방지를 위한 로드밸런서(Load Balancer) 분산 이론', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 로드밸런서 생성 및 다중 인스턴스를 타겟 그룹으로 연결', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '웹 서버 이중화 구성 완료 확인 및 로드밸런싱 접속 부하 분산 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '멀티 클라우드(AWS-NHN) 연계 아키텍처 설계 및 서비스 통합 구성 예시', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '클라우드 인프라 자원(CPU, Memory) 모니터링 시스템 구축 및 장애 알람 세팅', method: '시연/실습 (오프라인)' }, { time: '3교시 (1H)', content: '서버 장애 발생 시나리오 가정 및 백업/이중화를 통한 복구 시뮬레이션', method: '평가/마무리 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[2학기] MLOps(몰입) [15H]',
+                        goal: '완성된 AI 모델이 서비스로 배포되고 관리되는 생애주기(MLOps)를 이해하고, 오픈소스 플랫폼을 통한 배포 실습을 진행합니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션, 버전 관리 시스템(Git) 설치 및 Github 계정 연동', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '원격 저장소(Repository) 만들기 및 내 PC로 코드 내려받기(Clone) 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 스크립트 작성 및 로컬 변경 사항 서버로 올리기(Commit & Push)', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '소프트웨어 개발 주기(DevOps)와 AI 모델 주기(MLOps)의 차이 및 필요성', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '데이터 수집 - 모델 학습 - 모델 배포 - 모니터링 MLOps 파이프라인 개념', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '오픈소스 AI 모델의 성지, Hugging Face 플랫폼의 구조와 생태계 탐색', method: '사례연구 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Hugging Face에서 내 목적에 맞는 오픈소스 딥러닝 모델 검색 요령', method: '시연/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Transformers 라이브러리를 활용해 로컬 환경으로 모델 다운로드 및 로드', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '테스트용 샘플 데이터를 모델에 입력하여 로컬 추론(Inference) 테스트 진행', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '무료 AI 모델 배포 클라우드 플랫폼인 Hugging Face Spaces 환경 소개', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Gradio 라이브러리를 활용한 웹 데모 UI(입/출력창) 구성 뼈대 만들기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '로드된 딥러닝 모델의 추론 함수와 Gradio 인터페이스(버튼 이벤트) 결합하기', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '클라우드 서버 구동을 위한 의존성 패키지 명세서(requirements.txt) 작성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Git 명령어를 통해 작성한 모델 소스 코드를 Hugging Face Spaces에 최종 Push', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '배포된 AI 웹 서비스 접속 후 작동 확인 및 MLOps 전체 과정 리뷰', method: '발표/리뷰 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[2학기] Cloud Native 아키텍처(몰입) [15H]',
+                        goal: '현대 애플리케이션의 핵심인 컨테이너(Docker)의 원리를 이해하고, 앱을 패키징하여 클라우드에 배포하는 능력을 기릅니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션, 컨테이너 실습을 위한 Docker Desktop 설치', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '터미널에서 Docker 데몬 상태 확인 및 "Hello-World" 컨테이너 구동', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '컨테이너 라이프사이클 관리를 위한 필수 명령어(pull, run, ps, rm) 실습', method: '개인실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '소프트웨어 아키텍처 진화: 모놀리식(Monolithic) vs MSA 구조의 차이', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '무거운 가상머신(VM)과 가벼운 컨테이너(Container) 기술의 아키텍처 비교', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: 'Docker 엔진 핵심 구조(Client, Host, Registry) 및 이미지 개념 이해', method: '이론/퀴즈 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Docker Registry(Hub)의 역할, 이미지 검색 방법 및 버전 네이밍 룰 파악', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: '컨테이너간 통신을 위한 브릿지 네트워크 및 데이터 영속성을 위한 볼륨 기초', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: '공개된 Nginx 웹 서버 이미지를 로컬 컨테이너로 띄워 포트포워딩 접속하기', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'HTML/CSS를 활용한 간단한 나만의 정적 웹 페이지 작성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '작성한 웹 코드를 포함하는 커스텀 Nginx Dockerfile 작성 및 빌드(Build)', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '빌드된 커스텀 이미지를 로컬 컨테이너로 실행하고 오류 발생 시 디버깅', method: '개인실습 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Docker Hub 계정 연동 및 내 이미지를 퍼블릭 레지스트리에 Push', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 실습 서버 접속 및 Docker 환경 준비', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '클라우드 환경에서 내 이미지 Pull & Run으로 서비스 실 배포 완료', method: '시연/평가 (오프라인)' } ] }
+                        ]
+                    }
+                ]
+            },
+            'factory': {
+                title: '제조AI(기계자동차)',
+                color: 'emerald',
+                courses: [
+                    {
+                        name: '[1학기] 제조설비 AI모델링 [30H]',
+                        goal: '제조 현장의 AI 활용 사례를 이해하고, 센서 데이터를 시각화하며 이상 탐지 및 불량 예측 모델을 직접 실행·해석하여 실제 현장 적용 방안을 제안할 수 있습니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 데이터 기반 문제 해결 프로세스 안내', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '제조 AI 핵심 개념과 실제 산업 적용 사례 시청', method: '사례연구 (오프라인)' }, { time: '3교시 (1H)', content: '"왜 AI인가?" 비전공자 눈높이에 맞춘 제조 현장의 문제 해결 경험 토의', method: '토의/실습 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '일상 속 센서 비유를 통한 제조 센서 개념 이해', method: '이론/비유 (온라인)' }, { time: '2교시 (1H)', content: '실습에 활용할 제조 설비(진동/온도 등) 데이터셋(CSV) 구조 파악', method: '사례분석 (온라인)' }, { time: '3교시 (1H)', content: '센서 데이터가 시스템에 수집되고 축적되는 과정의 시각적 이해', method: '이론/시연 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 파이썬 데이터 분석 기초 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '준비된 제조 데이터셋(CSV)을 Colab 환경에 불러오기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '기본 코드를 활용하여 데이터 정보(행/열) 및 결측치 확인', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '보이지 않는 데이터를 보이게 만드는 센서 데이터 시각화의 중요성', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '파이썬 코드로 기본 시계열 그래프 및 분포도 그리기 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '출력된 센서 데이터 그래프의 추세 및 비정상 패턴 시각적 해석', method: '사례분석 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '결측치 및 이상치의 개념과 모델에 미치는 영향', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: '파이썬 코드를 활용한 결측치 채우기 및 이상치 제거 전처리 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '전처리 전후의 데이터 변화 시각적 비교 및 정제 결과 토의', method: '해석토의 (오프라인)' } ] },
+                            { day: '6일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '기존 데이터 조합을 통한 직관적인 파생 변수(Feature) 생성 개념', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '강사 시연 후 학생 주도형으로 진행하는 제조 파생 변수 추가 실습', method: '강의/시연 (오프라인)' }, { time: '3교시 (1H)', content: '새롭게 변형된 데이터가 불량 예측 분석에 어떻게 유리해지는지 해석', method: '해석토의 (오프라인)' } ] },
+                            { day: '7일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '머신러닝 알고리즘의 직관적 이해 (입력 데이터와 불량 여부의 관계)', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: 'Scikit-learn 라이브러리를 활용한 기본 분류 모델 구동', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '전처리된 데이터를 입력하여 모델 학습을 완료하고 1차 정답률 확인', method: '결과확인 (오프라인)' } ] },
+                            { day: '8일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '상황 기반 평가 지표 이해 (정밀도/재현율)', method: '상황설명 (오프라인)' }, { time: '2교시 (1H)', content: '혼동행렬(Confusion Matrix) 출력 코드 실행 및 지표 분석', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '시각화된 평가 결과를 바탕으로 모델의 제조 현장 적용 가능성 토의', method: '해석토의 (오프라인)' } ] },
+                            { day: '9일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '데이터 속 숨은 불량을 찾는 이상 탐지(Anomaly Detection) 모델 개념', method: '개념안내 (오프라인)' }, { time: '2교시 (1H)', content: '이상 탐지 알고리즘 코드를 실행하여 정상 데이터 속 미세 불량 도출', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '도출된 이상치 결과를 바탕으로 공정 불량 원인 해석 및 브레인스토밍', method: '해석토의 (오프라인)' } ] },
+                            { day: '10일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '제공된 기획 템플릿을 활용하여 조별 제조 AI 분석 과정 및 결과 정리', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '단일 제조 데이터셋 기반 불량 예측 모델링 스토리 조별 최종 발표', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '강사 피드백 및 성찰일지 작성 마무리', method: '마무리 (오프라인)' } ] }
+                        ]
+                    },
+                    {
+                        name: '[2학기] Digital Twin 기반 공정 시뮬레이션 [30H]',
+                        goal: 'Digital Twin의 개념과 제조 현장 활용 사례를 이해하고, 파이썬(SimPy)을 활용한 공정 시뮬레이션 코드를 실행 및 해석하여, 파라미터 최적화 실험과 결과 시각화를 통해 공정 개선 방안을 제안할 수 있습니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 Digital Twin(DT)의 기본 개념 이해', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '게임 속 가상 세계 비유를 통한 DT와 시뮬레이션의 차이 파악', method: '이론/비유 (오프라인)' }, { time: '3교시 (1H)', content: '실제 제조 현장의 DT 도입 우수 사례 및 기대 효과 영상 분석', method: '사례연구 (오프라인)' } ] },
+                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '공정 시뮬레이션의 목적과 필수 구성 요소(엔티티, 자원, 시간) 파악', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '제조 데이터의 흐름과 시뮬레이션 이벤트의 순차적 관계 시각적 이해', method: '이론/시연 (온라인)' }, { time: '3교시 (1H)', content: '데이터 기반 의사결정을 위한 시뮬레이션 결과 분석의 중요성', method: '사례분석 (온라인)' } ] },
+                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 파이썬 SimPy 라이브러리 활용 준비', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'SimPy 기초 시뮬레이션 코드 블록 복사/붙여넣기 실행', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '코드 내 주요 변수의 의미 파악 및 수정 테스트', method: '개인실습 (오프라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '단순 공정(기계 1대) 시뮬레이션 모델링 코드 구조 읽기 및 실행', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '시뮬레이션 실행 후 출력되는 로그 및 대기 시간 데이터 확인', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '출력 결과를 바탕으로 기계의 가동률 및 작업 지연 원인 시각적 해석', method: '사례분석 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '단일 기계를 넘어 여러 단계로 이어지는 연속 공정의 흐름 이해', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '다단계 시뮬레이션 코드 블록 조립 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '공정 단계 추가 시뮬레이션 구동 및 단계별 소요 시간 산출 결과 해석', method: '해석토의 (오프라인)' } ] },
+                            { day: '6일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '공정 효율을 떨어뜨리는 병목 현상(Bottleneck) 개념 이해', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: '시뮬레이션 코드를 실행하여 다단계 공정 중 대기열 발생 지점 찾기', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '로그 데이터를 통해 병목 지점을 특정하고 원인 분석 브레인스토밍', method: '해석토의 (오프라인)' } ] },
+                            { day: '7일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '공정 성능 파라미터(투입 인원, 기계 수) 개념 이해', method: '상황설명 (오프라인)' }, { time: '2교시 (1H)', content: '주요 수치를 직접 변경하며 여러 가지 시나리오 시뮬레이션 반복 구동', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파라미터 변경 전/후의 공정 대기 시간 및 총 생산량 변화량 기록 분석', method: '결과확인 (오프라인)' } ] },
+                            { day: '8일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '다양한 파라미터 실험 결과를 표 형태로 수집하고 정리', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별로 실험 결과 표를 비교 분석하여 비용 대비 효율이 높은 최적 조건 도출', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '최적화 방안 논리적 근거 마련 및 토의', method: '해석토의 (오프라인)' } ] },
+                            { day: '9일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '시뮬레이션 결과 데이터를 설득력 있게 보여주기 위한 시각화 전략', method: '개념안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Matplotlib 연동 시뮬레이션 결과 시각화 차트 코드 실행', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '시각화된 그래프를 바탕으로 공정 개선안 발표 스토리보드 작성', method: '조별실습 (오프라인)' } ] },
+                            { day: '10일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '제공된 템플릿을 활용하여 조별 공정 최적화 시뮬레이션 결과 리포트 완성', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별 시뮬레이션 기반 의사결정 최종 결과 발표 진행 및 상호 피드백', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '강사 피드백 및 전체 과정 성찰일지 작성 마무리', method: '마무리 (오프라인)' } ] }
+                        ]
+                    }
+                ]
+            },
+            'arch': {
+                title: 'AIAD(건축)',
+                color: 'rose',
+                courses: [
+                    {
+                        name: '[1학기] AI Data 분석 및 시각화 [15H]',
+                        goal: '건축·도시 분야에서 데이터와 AI가 활용되는 사례를 이해하고, 제공된 공공 건축 데이터를 파이썬으로 분석 및 시각화(그래프/지도)하여 건축 관련 의사결정 인사이트를 도출할 수 있습니다.',
+                        days: [
+                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 AI 건축 활용 사례 탐구', method: '강의/토의 (오프라인)' }, { time: '2교시 (1H)', content: '건축 데이터(정량, 위치, 시계열) 종류 파악 및 데이터의 중요성 안내', method: '강의/안내 (오프라인)' }, { time: '3교시 (1H)', content: 'ChatGPT를 활용한 AI 건축 미래 상상 토론 및 1일차 성찰일지 작성', method: '조별토의 (오프라인)' } ] },
+                            { day: '2일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 건축 데이터셋 업로드', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Pandas 라이브러리 기초: 데이터 불러오기 및 구조 파악', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '조건 필터링, 정렬을 활용하여 핵심 정보 탐색 실습', method: '개인실습 (오프라인)' } ] },
+                            { day: '3일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '데이터 시각화 필요성 및 Matplotlib 기초: 막대그래프 시각화 실습', method: '이론/실습 (온라인)' }, { time: '2교시 (1H)', content: 'Matplotlib 히스토그램을 활용한 건물 층수 분포 시각화 및 해석', method: '온라인실습' }, { time: '3교시 (1H)', content: 'Matplotlib 산점도를 활용한 상관관계 분석 및 퀴즈 풀이', method: '이론/평가 (온라인)' } ] },
+                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Folium 라이브러리를 활용한 기본 지도/마커 생성 실습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '데이터셋의 위도/경도를 활용한 다중 마커 표시 및 팝업 띄우기 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Folium 히트맵(HeatMap)을 활용한 건물 밀집 지역 시각화 및 토의', method: '해석토의 (오프라인)' } ] },
+                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '미니 프로젝트 목표 및 루브릭 안내, 조별 분석 결과 최종 정리', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별 건축 데이터 분석 인사이트 발표 진행 및 동료 피드백', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '우수팀 시상 및 강사 총평, 과정 최종 성찰일지 작성', method: '마무리 (오프라인)' } ] }
+                        ]
+                    }
+                ]
+            }
         };
-        const inactiveClasses = ["bg-white", "text-slate-600", "border-slate-300", "hover:bg-slate-100"];
+
+        const courseLimits = {
+            '[1학기] 프롬프트엔지니어링(15H)': 5,
+            '[1학기] 클라우드입문(15H)': 5,
+            '[1학기] ML/딥러닝 기초(15H)': 5,
+            '[1학기] LLM 애플리케이션(30H)': 10,
+            '[1학기] 제조설비 AI모델링(30H)': 10,
+            '[1학기] AI Data 분석(15H)': 5,
+            '[2학기] AI 디자인 씽킹(15H)': 5,
+            '[2학기] NHN/AWS 멀티클라우드(15H)': 5,
+            '[2학기] MLOps(15H)': 5,
+            '[2학기] Cloud Native(15H)': 5,
+            '[2학기] Digital Twin(30H)': 10
+        };
 
         window.showTrack = function(trackKey) {
             const btnStyles = {
@@ -585,6 +756,7 @@
                 'arch': { active: 'bg-rose-100 text-rose-800 border-rose-300 shadow-md ring-1 ring-rose-400', inactive: 'bg-white text-rose-600 border-rose-200 hover:bg-rose-50' }
             };
             const baseClass = "px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer";
+            
             Object.keys(btnStyles).forEach(key => {
                 const btn = document.getElementById(`btn-${key}`);
                 if(btn) {
@@ -598,11 +770,11 @@
             
             const data = curriculumData[trackKey];
             courseContainer.innerHTML = ''; 
-            courseContainer?.classList?.remove('hidden');
+            courseContainer.classList.remove('hidden');
 
             data.courses.forEach((course, index) => {
                 const btn = document.createElement('button');
-                btn.className = `course-btn px-4 py-2 rounded-full text-sm font-semibold border transition-all cursor-pointer flex items-center shadow-sm`;
+                btn.className = `course-btn px-4 py-2 rounded-full text-sm font-semibold border transition-all cursor-pointer flex items-center shadow-sm bg-white text-slate-600 border-slate-300 hover:bg-slate-100`;
                 btn.id = `btn-course-${trackKey}-${index}`;
                 const displayName = course.name.split(' [')[0]; 
                 btn.innerHTML = `<i class="fas fa-bookmark opacity-50 mr-2 text-xs"></i>${displayName}`;
@@ -617,31 +789,37 @@
             }
         };
 
+        const colorMappings = {
+            indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-600', lightBg: 'bg-indigo-100', lightText: 'text-indigo-800', lightBorder: 'border-indigo-200', check: 'text-indigo-500', active: ['bg-indigo-600', 'text-white', 'border-indigo-600', 'transform', 'scale-[1.02]'] },
+            blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-600', lightBg: 'bg-blue-100', lightText: 'text-blue-800', lightBorder: 'border-blue-200', check: 'text-blue-500', active: ['bg-blue-600', 'text-white', 'border-blue-600', 'transform', 'scale-[1.02]'] },
+            emerald: { bg: 'bg-emerald-600', text: 'text-emerald-600', border: 'border-emerald-600', lightBg: 'bg-emerald-100', lightText: 'text-emerald-800', lightBorder: 'border-emerald-200', check: 'text-emerald-500', active: ['bg-emerald-600', 'text-white', 'border-emerald-600', 'transform', 'scale-[1.02]'] },
+            rose: { bg: 'bg-rose-600', text: 'text-rose-600', border: 'border-rose-600', lightBg: 'bg-rose-100', lightText: 'text-rose-800', lightBorder: 'border-rose-200', check: 'text-rose-500', active: ['bg-rose-600', 'text-white', 'border-rose-600', 'transform', 'scale-[1.02]'] }
+        };
+        const inactiveClasses = ["bg-white", "text-slate-600", "border-slate-300", "hover:bg-slate-100"];
+
         window.showCourse = function(trackKey, courseIndex) {
             const data = curriculumData[trackKey];
             const course = data.courses[courseIndex];
             const theme = colorMappings[data.color];
 
-            // 1. 모든 서브 버튼 초기화
             document.querySelectorAll('.course-btn').forEach(btn => {
-                btn?.classList?.remove(...colorMappings['indigo'].active, ...colorMappings['blue'].active, ...colorMappings['emerald'].active, ...colorMappings['rose'].active);
-                btn?.classList?.add(...inactiveClasses);
+                btn.classList.remove(...colorMappings['indigo'].active, ...colorMappings['blue'].active, ...colorMappings['emerald'].active, ...colorMappings['rose'].active);
+                btn.classList.add(...inactiveClasses);
                 const icon = btn.querySelector('i');
                 if(icon) {
-                    icon?.classList?.remove('opacity-100');
-                    icon?.classList?.add('opacity-50');
+                    icon.classList.remove('opacity-100');
+                    icon.classList.add('opacity-50');
                 }
             });
 
-            // 2. 현재 선택된 버튼 스타일 적용
             const activeBtn = document.getElementById(`btn-course-${trackKey}-${courseIndex}`);
             if (activeBtn) {
-                activeBtn?.classList?.remove(...inactiveClasses);
-                activeBtn?.classList?.add(...theme.active);
+                activeBtn.classList.remove(...inactiveClasses);
+                activeBtn.classList.add(...theme.active);
                 const icon = activeBtn.querySelector('i');
                 if(icon) {
-                    icon?.classList?.remove('opacity-50');
-                    icon?.classList?.add('opacity-100');
+                    icon.classList.remove('opacity-50');
+                    icon.classList.add('opacity-100');
                 }
             }
 
@@ -736,9 +914,8 @@
             '2026-12-25': '성탄절'
         };
 
-        function generateTableRows(semester, startDateStr) {
+        window.generateTableRows = function(semester, startDateStr) {
             let html = '';
-            // 타임존 변경 이슈를 방지하기 위해 로컬 시간 강제 적용
             let [y, m, dayOfMonth] = startDateStr.split('-');
             let currDate = new Date(y, m - 1, dayOfMonth);
             let rowIdx = 0;
@@ -779,7 +956,7 @@
                         <td class="p-1 border-r ${tdClass} align-middle">
                             <div class="flex items-center justify-center gap-1">
                                 <input type="date" class="date-input w-full max-w-[110px] bg-transparent outline-none text-xs text-center cursor-pointer ${textClass}" value="${dateStr}">
-                                <button type="button" onclick="addDailyRow(this)" class="text-indigo-500 hover:text-white hover:bg-indigo-500 bg-indigo-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors" title="이 날짜에 강의 추가">
+                                <button type="button" onclick="window.addDailyRow(this)" class="text-indigo-500 hover:text-white hover:bg-indigo-500 bg-indigo-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors" title="이 날짜에 강의 추가">
                                     <i class="fas fa-plus text-[10px]"></i>
                                 </button>
                             </div>
@@ -805,7 +982,7 @@
                 }
             }
             return html;
-        }
+        };
 
         window.addDailyRow = function(btn) {
             const tr = btn.closest('tr');
@@ -814,7 +991,7 @@
             
             const btnContainer = clone.querySelector('div.flex');
             const actionBtn = btnContainer.querySelector('button');
-            actionBtn.setAttribute('onclick', 'removeDailyRow(this)');
+            actionBtn.setAttribute('onclick', 'window.removeDailyRow(this)');
             actionBtn.className = 'text-rose-500 hover:text-white hover:bg-rose-500 bg-rose-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors';
             actionBtn.innerHTML = '<i class="fas fa-minus text-[10px]"></i>';
             actionBtn.title = '이 강의 행 삭제';
@@ -831,7 +1008,6 @@
                 if(inp.placeholder === '비고') inp.value = '';
             });
 
-            // 추가된 행의 날짜 수정 방지 (고정 처리)
             const dateInput = clone.querySelector('.date-input');
             if (dateInput) {
                 dateInput.setAttribute('readonly', 'true');
@@ -840,13 +1016,13 @@
             }
 
             tr.after(clone);
-            updateAllocationStatus(); 
+            window.updateAllocationStatus(); 
         };
 
         window.removeDailyRow = function(btn) {
             const tr = btn.closest('tr');
             tr.remove();
-            updateAllocationStatus(); 
+            window.updateAllocationStatus(); 
         };
 
         window.updateRowStyle = function(dateInput) {
@@ -912,22 +1088,22 @@
         window.resetSchedule = function() {
             const modal = document.getElementById('reset-modal');
             if(modal) {
-                modal?.classList?.remove('hidden');
+                modal.classList.remove('hidden');
                 void modal.offsetWidth;
-                modal?.classList?.remove('opacity-0');
+                modal.classList.remove('opacity-0');
                 const content = document.getElementById('reset-modal-content');
-                if(content) content?.classList?.remove('scale-95');
+                if(content) content.classList.remove('scale-95');
             }
         };
 
         window.closeResetModal = function() {
             const modal = document.getElementById('reset-modal');
             if(modal) {
-                modal?.classList?.add('opacity-0');
+                modal.classList.add('opacity-0');
                 const content = document.getElementById('reset-modal-content');
-                if(content) content?.classList?.add('scale-95');
+                if(content) content.classList.add('scale-95');
                 setTimeout(() => {
-                    modal?.classList?.add('hidden');
+                    modal.classList.add('hidden');
                 }, 300);
             }
         };
@@ -939,28 +1115,14 @@
             selects.forEach(el => {
                 el.value = "";
                 if(el.classList.contains('course-select')) el.prevValue = "";
-                updateSelectColor(el);
+                window.updateSelectColor(el);
             });
             
-            updateAllocationStatus();
+            window.updateAllocationStatus();
             window.closeResetModal();
         };
 
-        const courseLimits = {
-            '[1학기] 프롬프트엔지니어링(15H)': 5,
-            '[1학기] 클라우드입문(15H)': 5,
-            '[1학기] ML/딥러닝 기초(15H)': 5,
-            '[1학기] LLM 애플리케이션(30H)': 10,
-            '[1학기] 제조설비 AI모델링(30H)': 10,
-            '[1학기] AI Data 분석(15H)': 5,
-            '[2학기] AI 디자인 씽킹(15H)': 5,
-            '[2학기] NHN/AWS 멀티클라우드(15H)': 5,
-            '[2학기] MLOps(15H)': 5,
-            '[2학기] Cloud Native(15H)': 5,
-            '[2학기] Digital Twin(30H)': 10
-        };
-
-        function getCounts() {
+        window.getCounts = function() {
             const selects = document.querySelectorAll('.course-select');
             let counts = {};
             Object.keys(courseLimits).forEach(k => counts[k] = 0);
@@ -970,10 +1132,10 @@
                 }
             });
             return counts;
-        }
+        };
 
-        function updateAllocationStatus() {
-            const counts = getCounts();
+        window.updateAllocationStatus = function() {
+            const counts = window.getCounts();
             let html = '';
             for(let course in courseLimits) {
                 let max = courseLimits[course];
@@ -989,198 +1151,32 @@
             }
             const dashboard = document.getElementById('allocation-dashboard');
             if(dashboard) dashboard.innerHTML = html;
-        }
+        };
 
-        function updateSelectColor(selectElement) {
+        window.updateSelectColor = function(selectElement) {
             const val = selectElement.value;
-            selectElement?.classList?.remove('sel-course-1', 'sel-course-2', 'sel-manager-eu', 'sel-manager-pe', 'sel-manager-aws', 'sel-manager-nhn');
+            selectElement.classList.remove('sel-course-1', 'sel-course-2', 'sel-manager-eu', 'sel-manager-pe', 'sel-manager-aws', 'sel-manager-nhn');
             
-            if (val === '으뜸') selectElement?.classList?.add('sel-manager-eu');
-            else if (val === '페픽') selectElement?.classList?.add('sel-manager-pe');
-            else if (val === 'AWS') selectElement?.classList?.add('sel-manager-aws');
-            else if (val === 'NHN') selectElement?.classList?.add('sel-manager-nhn');
-            else if (val.includes('[1학기]')) selectElement?.classList?.add('sel-course-1');
-            else if (val.includes('[2학기]')) selectElement?.classList?.add('sel-course-2');
-        }
-
-        // Clean Curriuculm Data (No duplicates)
-        const curriculumData = {
-            'common': {
-                title: '공통(초급)',
-                color: 'indigo',
-                courses: [
-                    {
-                        name: '[1학기] 프롬프트엔지니어링(몰입) [15H]',
-                        goal: '생성형 AI의 원리를 이해하고, 목적에 맞는 프롬프트를 작성하여 실무와 학습에 AI를 200% 활용하는 방법을 습득합니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 AI 현황 이해, 계정 생성', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'AI는 어떻게 대답하는가? (LLM 원리 쉽게 이해)', method: '강의/퀴즈 (오프라인)' }, { time: '3교시 (1H)', content: 'AI vs 사람 답변 비교 실습, 정리 및 성찰일지 작성', method: '모둠/개인 (오프라인)' } ] },
-                            { day: '2일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '전일 복습, 나쁜 프롬프트 사례 분석 및 3요소(명확성/구체성/맥락) 학습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '같은 목적, 다른 프롬프트 적용 및 결과 비교 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '프롬프트 개선 챌린지(짝 활동), OX 퀴즈 형성평가 및 정리', method: '협동학습 (오프라인)' } ] },
-                            { day: '3일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: 'Role Prompting(역할 부여) 및 Context Prompting(배경 정보 제공)', method: '이론/실습 (온라인)' }, { time: '2교시 (1H)', content: 'Format Prompting: 원하는 템플릿 양식으로 출력 형식 지정하기', method: '이론/실습 (온라인)' }, { time: '3교시 (1H)', content: 'Chain-of-Thought(단계별 사고 유도) 실습 및 온라인 퀴즈 제출', method: '이론/평가 (온라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '활용 시나리오(학업/취업/창작/업무) 소개 및 시나리오별 프롬프트 작성 실습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '모둠별 최고의 프롬프트 선정 및 결과물 개선 논의', method: '모둠활동 (오프라인)' }, { time: '3교시 (1H)', content: '개선된 프롬프트 모둠 발표, 상호 피드백 및 다음 차시 안내', method: '발표/평가 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '프롬프트 북 개념 및 구조 안내, 나만의 프롬프트 북 제작 돌입', method: '강의/제작 (오프라인)' }, { time: '2교시 (1H)', content: '분야별 10개 이상의 프롬프트를 담은 프롬프트 북 문서 완성', method: '개인제작 (오프라인)' }, { time: '3교시 (1H)', content: '결과물 발표, 동료/강사 피드백, 우수작 공유 및 최종 성찰일지 작성', method: '발표/평가 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[2학기] AI 디자인 씽킹(몰입) [15H]',
-                        goal: '사용자 중심의 문제 해결 방법론인 디자인 씽킹에 AI 도구를 접목하여 기획력과 창의적 문제 해결 능력을 기릅니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 팀 빌딩, 문제 해결을 위한 공감(Empathize) 기초 실습', method: '토의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '타겟 사용자 분석 및 주변의 일상 문제 발굴 브레인스토밍', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '협업 툴(Miro) 환경 세팅 안내 및 가상 인터뷰 챗봇 테스트', method: '실습안내 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '디자인 씽킹 5단계 프로세스의 직관적 이해 및 이론', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: 'AI 기술이 바꾼 최신 서비스 기획 및 프로토타이핑 트렌드 분석', method: '사례연구 (온라인)' }, { time: '3교시 (1H)', content: '데이터 수집 방법론 및 타겟 고객 여정 지도(CJ)의 중요성 파악', method: '이론/퀴즈 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '사용자 경험 매핑: 고객 여정 지도(Customer Journey Map) 뼈대 잡기', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'weeai 생성 데이터를 반영한 여정 내 Pain-point 구체화', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Miro를 활용한 조별 고객 여정 지도 시각화 및 발표', method: '조별실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '아이디에이션(Ideation): 문제를 해결할 다양한 아이디어 발산', method: '브레인스토밍 (오프라인)' }, { time: '2교시 (1H)', content: '실현 가능성과 임팩트 매트릭스를 활용한 핵심 아이디어 선정', method: '토의/실습 (오프라인)' }, { time: '3교시 (1H)', content: '최소 기능 제품(MVP) 및 프로토타입 기초 스토리보드 작성', method: '조별실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AI 프로토타이핑 도구(Miro, v0.dev 등)를 활용한 MVP 스케치', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '사용자 시나리오를 바탕으로 프로토타입 디자인 완성', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '조별 디자인 씽킹 결과물(MVP) 최종 시연 및 상호 피드백', method: '발표/평가 (오프라인)' } ] }
-                        ]
-                    }
-                ]
-            },
-            'data': {
-                title: 'AI 데이터SW(컴공)',
-                color: 'blue',
-                courses: [
-                    {
-                        name: '[1학기] 클라우드입문 (몰입) [15H]',
-                        goal: '클라우드 컴퓨팅의 기본 개념을 이해하고, AWS 핵심 서비스(EC2, S3 등)를 직접 다루며 인프라 구축의 기초를 다집니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 실습을 위한 AWS Educate/프리티어 계정 생성', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'AWS 콘솔 대시보드 화면 구성 파악 및 보안(MFA) 기본 세팅', method: '시연/실습 (오프라인)' }, { time: '3교시 (1H)', content: '가상머신(EC2) 개념 맛보기 및 나만의 첫 EC2 인스턴스 생성 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '클라우드 컴퓨팅(IaaS, PaaS, SaaS)의 개념 완벽 이해', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '온프레미스와 클라우드 인프라의 결정적 차이와 경제성 파악', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: 'AWS 글로벌 인프라(리전, 가용영역) 및 핵심 서비스 라인업 소개', method: '이론/퀴즈 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '클라우드 보안의 핵심: IAM(Identity and Access Management) 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '생성한 EC2 인스턴스에 SSH 클라이언트를 이용한 원격 접속', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '리눅스(Linux) 기초 명령어 실습 및 기본 웹 서버 구동 확인', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '무제한 저장소 AWS S3 객체 스토리지 버킷 생성 및 권한 설정', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '간단한 정적 웹 페이지(HTML/CSS) 작성 및 S3 파일 업로드', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'S3 정적 웹사이트 호스팅 기능을 이용해 내 페이지 인터넷 퍼블리싱', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '독립된 가상 네트워크(VPC, 서브넷, 인터넷 게이트웨이) 구축 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '새로운 VPC 안에 EC2를 배치하고 방화벽(보안 그룹) 규칙 세밀하게 조정', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '비용 폭탄 방지(Billing 알람) 설정 및 CloudWatch 기초 모니터링', method: '마무리/평가 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[1학기] ML/딥러닝 기초 [15H]',
-                        goal: '수식 없이 직관적인 노코드/로우코드 툴을 활용하여 머신러닝/딥러닝 모델의 학습 원리와 데이터 분석 기초를 체험합니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 인공지능의 학습 방식(강아지/고양이 구별법) 시연', method: '강의/시연 (오프라인)' }, { time: '2교시 (1H)', content: '구글 티처블 머신(Teachable Machine) UI 접속 및 웹캠 연동 셋팅', method: '실습안내 (오프라인)' }, { time: '3교시 (1H)', content: '웹캠 활용 가위/바위/보 객체 이미지 수집, 학습 및 실시간 분류 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '인공지능, 머신러닝, 딥러닝의 명확한 차이와 발전 역사', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '지도학습(정답이 있는)과 비지도학습(정답이 없는) 알고리즘 분류', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '머신러닝의 양대 산맥: 분류(Classification)와 회귀(Regression)의 차이', method: '이론/퀴즈 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AI가 공부하는 책, 데이터 셋(Train, Validation, Test) 분할 개념', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '과적합(Overfitting) 방지 및 모델 평가 지표(정확도 등) 기초', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '학습된 모델의 정확도 테스트 및 인식률 저하(한계점) 체험 개선 실습', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코딩 없는 데이터 분석 툴, Orange Data Mining 설치 및 노드 연결 방식 파악', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '엑셀(CSV) 데이터셋 불러오기 및 Data Table 노드를 통한 원시 데이터 구조 확인', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Scatter Plot 등 시각화 노드를 활용해 데이터 피처간 연관성 흐름 파악하기', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '의사결정나무(Decision Tree) 노드 연결을 통한 타겟 값(생존/사망 등) 예측 모델 생성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '타이타닉 생존자 데이터를 직접 분석하고, 내가 살 수 있었을지 예측 테스트', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Confusion Matrix 노드로 내 모델의 성적표(정확도) 도출 및 데이터 분석 과정 랩업', method: '마무리/평가 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[1학기] LLM 애플리케이션(몰입) [30H]',
-                        goal: '파이썬 기초 문법을 익히고, weeai 및 OpenAI API 연동하여 나만의 맞춤형 AI 챗봇(RAG)과 웹 서비스를 개발합니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 구글 코랩(Colab) 환경 구성, 단축키 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'API 개념 직관적 이해 및 weeai/OpenAI API Key 발급, 환경변수 보안 세팅', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 기본 입출력(print)으로 첫 코드 실행해보고 터미널 챗봇 뼈대 맛보기', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '파이썬 데이터의 그릇, 변수와 기본 데이터 타입 파악', method: '온라인실습' }, { time: '2교시 (1H)', content: '상황에 따라 다른 길로 가는 if, elif, else 조건문 문법 기초', method: '온라인실습' }, { time: '3교시 (1H)', content: '데이터를 묶어서 관리하는 파이썬 리스트(List)와 딕셔너리 구조', method: '온라인실습' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코드를 반복해서 실행해주는 for 문과 while 문의 문법 구조', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '자주 쓰는 코드를 하나로 묶는 함수(Function) 정의 및 매개변수', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 외부 모듈과 라이브러리(import) 활용의 이해', method: '이론/실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '인터넷 통신 프로토콜(HTTP) 기초와 GET/POST 방식의 차이', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: 'REST API 데이터 규격인 JSON 포맷의 구조 분석 및 파싱(Parsing) 이론', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 `requests` 라이브러리를 활용한 HTTP POST 요청 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'LLM API를 호출하여 질문을 전송하고 답변 받아보기 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '복잡한 JSON 응답 데이터에서 실제 AI의 텍스트 답변 내용만 추출(파싱)하기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '터미널 콘솔창에서 1회성 질문/답변이 구동되는 파이썬 스크립트 작성', method: '개인실습 (오프라인)' } ] },
-                            { day: '6일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '리스트/딕셔너리를 활용하여 챗봇의 이전 대화 기록(Memory/Context)을 저장하는 로직 구현', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '무한 반복(while True) 문을 결합하여 대화가 끊기지 않는 콘솔 채팅 앱 완성', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '시스템(System) 프롬프트를 변수로 처리하여 챗봇에 페르소나(예: 다정한 선생님) 입히기', method: '개인실습 (오프라인)' } ] },
-                            { day: '7일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '할루시네이션(거짓말)을 잡는 RAG(검색 증강 생성) 아키텍처 개요 및 작동 원리 이해', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '텍스트 분할(Chunking)과 자연어를 숫자로 바꾸는 임베딩(Embedding)의 기초 원리', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: '벡터 데이터베이스(Vector DB)의 역할 및 내 문서 업로드, 유사도 검색 맛보기', method: '개인실습 (오프라인)' } ] },
-                            { day: '8일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'weeai 플랫폼(또는 Langchain)을 활용한 나만의 문서 기반 RAG 파이프라인 셋팅', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '문서에서 검색된 문맥(Context)을 조합하여 LLM에 전달하는 RAG 프롬프트 작성 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '"문서에 없는 내용은 모른다고 답해" 등 할루시네이션 방지 방어 로직 적용 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '9일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '웹 개발 지식 없이 파이썬만으로 웹을 만드는 프레임워크(Streamlit) 개요 및 설치', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Streamlit 텍스트 출력, 입력 폼(Input), 버튼 등 기본 웹 화면 UI 컴포넌트 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '작성해둔 터미널 챗봇 API 로직을 Streamlit의 Submit 버튼 이벤트에 연결하여 웹 전환', method: '개인실습 (오프라인)' } ] },
-                            { day: '10일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Streamlit chat_message UI 컴포넌트를 활용한 실제 카카오톡/GPT 형태의 대화창 렌더링', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '완성된 내 문서 기반 AI 웹 챗봇 전체 구동 테스트, 에러 디버깅 및 코드 최적화', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Streamlit Cloud(무료) 또는 Github를 활용한 퍼블릭 웹 서비스 배포 시연 및 프로젝트 랩업', method: '발표/배포 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[2학기] NHN/AWS 멀티 클라우드 운영(몰입) [15H]',
-                        goal: '국내 클라우드 환경(NHN Cloud)과 글로벌 인프라(AWS)를 비교 실습하며 멀티 클라우드 아키텍처 운영 감각을 익힙니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 NHN Cloud 콘솔 접속, 프로젝트 생성 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '나만의 프라이빗 네트워크(VPC) 및 서브넷 기초 뼈대 구성 맛보기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '방화벽(보안 그룹) 기본 세팅 및 인터넷 게이트웨이 연동 실습', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: 'K-클라우드 산업 동향 및 공공/금융/의료 망 분리 클라우드 도입 요건 파악', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 주요 인프라 아키텍처 및 AWS 서비스(EC2, S3 등)와의 1:1 용어 비교', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '가용 영역(AZ) 이중화 및 클라우드 네트워크 라우팅(Routing) 기본 이론 복습', method: '이론/퀴즈 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '구성해둔 NHN Cloud VPC 내부에 가상 인스턴스(서버) 스펙 산정 및 다중 생성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '원격 접속용 키페어(Keypair) 관리 및 플로팅 IP(Public IP) 할당하여 접속하기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '서버 환경에 기본 웹 서버(Nginx) 패키지 설치하고 외부에서 IP 접속 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '서버 트래픽 폭주 방지를 위한 로드밸런서(Load Balancer) L4/L7 스위치 분산 이론', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 로드밸런서 생성 및 다중 인스턴스(웹서버 A, B)를 타겟 그룹으로 연결', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '웹 서버 이중화 구성 완료 확인 및 로드밸런싱 포트(80)를 통한 접속 부하 분산 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '멀티 클라우드(AWS-NHN) 연계 아키텍처 설계 시 고려사항 및 서비스 통합 구성 예시', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '클라우드 인프라 자원(CPU, Memory) 모니터링 시스템 구축 개요 및 장애 알람 세팅', method: '시연/실습 (오프라인)' }, { time: '3교시 (1H)', content: '서버 장애 발생(Stop) 시나리오 가정 및 백업/이중화를 통한 복구 시뮬레이션', method: '평가/마무리 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[2학기] MLOps(몰입) [15H]',
-                        goal: '완성된 AI 모델이 서비스로 배포되고 관리되는 생애주기(MLOps)를 이해하고, 오픈소스 플랫폼을 통한 배포 실습을 진행합니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션, 버전 관리 시스템(Git) 설치 및 Github 계정 생성 연동', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '나만의 원격 저장소(Repository) 만들기 및 내 PC로 코드 내려받기(Clone) 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '간단한 파이썬 스크립트 작성 및 로컬 변경 사항 서버로 올리기(Commit & Push)', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '소프트웨어 개발 주기(DevOps)와 AI 모델 주기(MLOps)의 차이 및 필요성', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '데이터 수집 - 모델 학습 - 모델 배포(Serving) - 모니터링 MLOps 파이프라인 개념', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '오픈소스 AI 모델의 성지, Hugging Face 플랫폼의 구조와 Model/Dataset 생태계 탐색', method: '사례연구 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Hugging Face에서 내 목적에 맞는 오픈소스 딥러닝 모델(예: 감성 분석) 검색 요령', method: '시연/실습 (오프라인)' }, { time: '2교시 (1H)', content: '파이썬 Transformers 라이브러리를 활용해 로컬 환경으로 모델 다운로드 및 메모리 로드', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '테스트용 샘플 텍스트/이미지 데이터를 모델에 입력하여 로컬 추론(Inference) 테스트 진행', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '무료 AI 모델 배포 클라우드 플랫폼인 Hugging Face Spaces 환경 소개 및 생성', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Gradio 라이브러리를 활용한 단 5줄 코드로 끝나는 웹 데모 UI(입/출력창) 구성 뼈대 만들기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '로드된 딥러닝 모델의 추론 함수와 Gradio 인터페이스(버튼 이벤트)와 결합하기', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '클라우드 서버 구동을 위한 의존성 패키지 명세서(requirements.txt) 작성 및 환경 설정', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Git 명령어를 통해 작성한 모델 소스 코드를 Hugging Face Spaces 플랫폼에 최종 Push', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '배포된 AI 웹 서비스 접속 후 작동 확인 및 MLOps 전체 과정 리뷰', method: '발표/리뷰 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[2학기] Cloud Native 아키텍처(몰입) [15H]',
-                        goal: '현대 애플리케이션의 핵심인 컨테이너(Docker)의 원리를 이해하고, 앱을 패키징하여 클라우드에 배포하는 능력을 기릅니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션, 컨테이너 실습을 위한 Docker Desktop 설치 및 환경 구성 검증', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '터미널에서 Docker 데몬 상태 확인 및 "Hello-World" 컨테이너 이미지 구동 테스트', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '컨테이너 라이프사이클 관리를 위한 필수 CLI 명령어(pull, run, ps, rm) 기초 맛보기', method: '개인실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '소프트웨어 아키텍처의 진화: 거대한 모놀리식(Monolithic) vs 유연한 MSA 구조의 차이', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '무거운 가상머신(VM) 하이퍼바이저와 가벼운 컨테이너(Container) 기술의 아키텍처 비교', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: 'Docker 엔진 핵심 구조(Client, Host, Registry) 및 이미지/컨테이너 개념 완벽 이해', method: '이론/퀴즈 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Docker Registry(Hub)의 역할, 이미지 검색 방법 및 버전(Tag) 네이밍 룰 파악', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: '컨테이너간 통신을 위한 내부 브릿지 네트워크 및 데이터 영속성을 위한 볼륨 기초', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: '공개된 Nginx 웹 서버 이미지를 로컬 컨테이너로 띄워 포트포워딩 접속하기', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'HTML/CSS를 활용한 간단한 나만의 정적 웹 페이지 작성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '작성한 웹 코드를 포함하는 커스텀 Nginx Dockerfile 작성 및 빌드(Build)', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '빌드된 커스텀 이미지를 로컬 컨테이너로 실행하고 오류 발생 시 디버깅', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Docker Hub 계정 연동 및 내 이미지를 퍼블릭 레지스트리에 Push', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'NHN Cloud 인스턴스 환경(또는 실습 서버) 접속 및 Docker 환경 준비', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '클라우드 환경에서 내 이미지 Pull & Run으로 서비스 실 배포 완료', method: '시연/평가 (오프라인)' } ] }
-                        ]
-                    }
-                ]
-            },
-            'factory': {
-                title: '제조AI(기계자동차)',
-                color: 'emerald',
-                courses: [
-                    {
-                        name: '[1학기] 제조설비 AI모델링 [30H]',
-                        goal: '제조 현장의 AI 활용 사례를 이해하고, 센서 데이터를 시각화하며 이상 탐지 및 불량 예측 모델을 직접 실행·해석하여 실제 현장 적용 방안을 제안할 수 있습니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습) - 제조 현장과 AI', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 데이터 기반 문제 해결 프로세스 안내', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '제조 AI 핵심 개념과 실제 산업 적용 사례 시청', method: '사례연구 (오프라인)' }, { time: '3교시 (1H)', content: '"왜 AI인가?" 비전공자 눈높이에 맞춘 제조 현장의 문제 해결 경험', method: '토의/실습 (오프라인)' } ] },
-                            { day: '2일차 (온라인) - 센서와 데이터란?', lessons: [ { time: '1교시 (1H)', content: '일상 속 센서(스마트폰 등) 비유를 통한 제조 센서 개념 이해', method: '이론/비유 (온라인)' }, { time: '2교시 (1H)', content: '실습에 활용할 제조 설비(진동/온도 등) 데이터셋(CSV) 구조 파악', method: '사례분석 (온라인)' }, { time: '3교시 (1H)', content: '센서 데이터가 시스템에 수집되고 축적되는 과정의 시각적 이해', method: '이론/시연 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습) - 데이터 읽기', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 파이썬 데이터 분석 기초 실습', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '준비된 제조 데이터셋(CSV)을 Colab 환경에 불러오기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '기본 코드(Pandas)를 활용하여 데이터 정보(행/열) 및 결측치 확인', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습) - 데이터 시각화', lessons: [ { time: '1교시 (1H)', content: '보이지 않는 데이터를 보이게 만드는 센서 데이터 시각화의 중요성', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '파이썬 코드로 기본 시계열 그래프 및 분포도 그리기 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '출력된 센서 데이터 그래프의 추세 및 비정상 패턴 시각적 해석', method: '사례분석 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습) - 데이터 전처리 1', lessons: [ { time: '1교시 (1H)', content: '결측치(빠진 데이터) 및 이상치(튀는 데이터)의 개념과 모델에 미치는 영향', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: '파이썬 코드를 활용한 결측치 채우기 및 이상치 제거 전처리 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '전처리 전후의 데이터 변화 시각적 비교 및 정제 결과 토의', method: '해석토의 (오프라인)' } ] },
-                            { day: '6일차 (오프라인 실습) - 데이터 전처리 2 (데이터 변형)', lessons: [ { time: '1교시 (1H)', content: '기존 데이터 조합을 통한 직관적인 파생 변수(Feature) 생성 개념', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '강사 시연 후 학생 주도형으로 진행하는 제조 파생 변수 추가 실습', method: '강의/시연 (오프라인)' }, { time: '3교시 (1H)', content: '새롭게 변형된 데이터가 불량 예측 분석에 어떻게 유리해지는지 해석', method: '해석토의 (오프라인)' } ] },
-                            { day: '7일차 (오프라인 실습) - AI 모델 학습', lessons: [ { time: '1교시 (1H)', content: '머신러닝 알고리즘의 직관적 이해 (입력 데이터와 불량 여부의 관계 학습)', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: 'Scikit-learn 라이브러리를 활용한 기본 분류(Classification) 모델 구동', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '전처리된 데이터를 입력하여 모델 학습을 완료하고 1차 정답률 확인', method: '결과확인 (오프라인)' } ] },
-                            { day: '8일차 (오프라인 실습) - 모델 평가', lessons: [ { time: '1교시 (1H)', content: '"불량품을 놓침" vs "정상품을 불량으로 오해" 등 상황 기반 평가 지표 이해', method: '상황설명 (오프라인)' }, { time: '2교시 (1H)', content: '혼동행렬(Confusion Matrix) 출력 코드 실행 및 지표(정밀도/재현율) 분석', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '시각화된 평가 결과를 바탕으로 우리 모델의 제조 현장 적용 가능성 토의', method: '해석토의 (오프라인)' } ] },
-                            { day: '9일차 (오프라인 실습) - 이상 탐지 실습', lessons: [ { time: '1교시 (1H)', content: '데이터 속 숨은 불량을 찾는 이상 탐지(Anomaly Detection) 모델 개념', method: '개념안내 (오프라인)' }, { time: '2교시 (1H)', content: '이상 탐지 알고리즘 코드를 실행하여 정상 데이터 속 미세 불량 도출', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '도출된 이상치 결과를 바탕으로 공정 불량 원인 해석 및 브레인스토밍', method: '해석토의 (오프라인)' } ] },
-                            { day: '10일차 (오프라인 실습) - 미니 프로젝트', lessons: [ { time: '1교시 (1H)', content: '제공된 기획 템플릿을 활용하여 조별 제조 AI 분석 과정 및 결과 정리', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '단일 제조 데이터셋 기반 불량 예측 모델링 스토리 조별 최종 발표', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '강사 피드백 및 "데이터로 문제를 해결하는 경험" 성찰일지 작성 마무리', method: '마무리 (오프라인)' } ] }
-                        ]
-                    },
-                    {
-                        name: '[2학기] Digital Twin 기반 공정 시뮬레이션 [30H]',
-                        goal: 'Digital Twin의 개념과 제조 현장 활용 사례를 이해하고, 파이썬(SimPy)을 활용한 공정 시뮬레이션 코드를 실행 및 해석하여, 파라미터 최적화 실험과 결과 시각화를 통해 공정 개선 방안을 제안할 수 있습니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습) - Digital Twin이란?', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 Digital Twin(DT)의 기본 개념 이해', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '게임 속 가상 세계 비유를 통한 DT와 시뮬레이션의 차이 파악', method: '이론/비유 (오프라인)' }, { time: '3교시 (1H)', content: '실제 제조 현장의 DT 도입 우수 사례 및 기대 효과 영상 분석', method: '사례연구 (오프라인)' } ] },
-                            { day: '2일차 (온라인) - 시뮬레이션 개념 이해', lessons: [ { time: '1교시 (1H)', content: '공정 시뮬레이션의 목적과 필수 구성 요소(엔티티, 자원, 시간) 파악', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '제조 데이터의 흐름과 시뮬레이션 이벤트의 순차적 관계 시각적 이해', method: '이론/시연 (온라인)' }, { time: '3교시 (1H)', content: '데이터 기반 의사결정을 위한 시뮬레이션 결과(로그) 분석의 중요성', method: '사례분석 (온라인)' } ] },
-                            { day: '3일차 (오프라인 실습) - Python 시뮬레이션 기초', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 파이썬 SimPy 라이브러리 활용 준비', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '강사가 제공한 SimPy 기초 시뮬레이션 코드 블록 복사/붙여넣기 실행', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '코드 내 주요 변수(도착 시간, 작업 시간)의 의미 파악 및 수정 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '4일차 (오프라인 실습) - 단순 공정 시뮬레이션', lessons: [ { time: '1교시 (1H)', content: '1단계 단순 공정(기계 1대) 시뮬레이션 모델링 코드 구조 읽기 및 실행', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '시뮬레이션 실행 후 출력되는 로그(Log) 및 대기 시간 데이터 확인', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '출력 결과를 바탕으로 기계의 가동률 및 작업 지연 원인 시각적 해석', method: '사례분석 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습) - 다단계 공정 모델링', lessons: [ { time: '1교시 (1H)', content: '단일 기계를 넘어 여러 단계로 이어지는 연속 공정의 흐름 이해', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '\'레고 블록 쌓기\' 비유를 통한 다단계 시뮬레이션 코드 블록 조립 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '공정 단계 추가 시뮬레이션 구동 및 단계별 소요 시간 산출 결과 해석', method: '해석토의 (오프라인)' } ] },
-                            { day: '6일차 (오프라인 실습) - 병목 현상 분석', lessons: [ { time: '1교시 (1H)', content: '공정 효율을 떨어뜨리는 병목 현상(Bottleneck) 개념 ("줄이 가장 긴 곳" 비유)', method: '이론/비유 (오프라인)' }, { time: '2교시 (1H)', content: '준비된 시뮬레이션 코드를 실행하여 다단계 공정 중 대기열 발생 지점 찾기', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '도출된 로그 데이터를 통해 병목 지점을 특정하고 원인 분석 브레인스토밍', method: '해석토의 (오프라인)' } ] },
-                            { day: '7일차 (오프라인 실습) - 파라미터 실험', lessons: [ { time: '1교시 (1H)', content: '공정 성능 파라미터(투입 인원, 기계 수) 개념 ("요리 레시피 변경" 비유)', method: '상황설명 (오프라인)' }, { time: '2교시 (1H)', content: '코드 내 주요 수치를 직접 변경하며 여러 가지 시나리오 시뮬레이션 반복 구동', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파라미터 변경 전/후의 공정 대기 시간 및 총 생산량 변화량 기록 분석', method: '결과확인 (오프라인)' } ] },
-                            { day: '8일차 (오프라인 실습) - 최적 조건 탐색', lessons: [ { time: '1교시 (1H)', content: '다양한 파라미터 실험 결과를 표(엑셀/데이터프레임) 형태로 수집하고 정리', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별로 실험 결과 표를 비교 분석하여 비용 대비 효율이 가장 높은 최적 조건 도출', method: '조별실습 (오프라인)' }, { time: '3교시 (1H)', content: '"왜 이 조건이 최적의 솔루션인가?" 논리적 근거 마련 및 최적화 방안 토의', method: '해석토의 (오프라인)' } ] },
-                            { day: '9일차 (오프라인 실습) - 결과 시각화', lessons: [ { time: '1교시 (1H)', content: '시뮬레이션 결과 데이터를 설득력 있게 보여주기 위한 시각화 전략 안내', method: '개념안내 (오프라인)' }, { time: '2교시 (1H)', content: '강사가 제공한 Matplotlib 연동 시뮬레이션 결과 시각화 차트 코드 실행', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '시각화된 그래프를 바탕으로 공정 개선안(최적 조건)을 보여줄 발표 스토리보드 작성', method: '조별실습 (오프라인)' } ] },
-                            { day: '10일차 (오프라인 실습) - 미니 프로젝트', lessons: [ { time: '1교시 (1H)', content: '제공된 발표 템플릿을 활용하여 조별 공정 최적화 시뮬레이션 결과 리포트 완성', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별 시뮬레이션 기반 의사결정(개선 방안) 최종 결과 발표 진행 및 상호 피드백', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '강사 피드백 및 "Digital Twin 기반 공정 최적화" 전체 과정 성찰일지 작성 마무리', method: '마무리 (오프라인)' } ] }
-                        ]
-                    }
-                ]
-            },
-            'arch': {
-                title: 'AIAD(건축)',
-                color: 'rose',
-                courses: [
-                    {
-                        name: '[1학기] AI Data 분석 및 시각화 [15H]',
-                        goal: '건축·도시 분야에서 데이터와 AI가 활용되는 사례를 이해하고, 제공된 공공 건축 데이터를 파이썬으로 분석 및 시각화(그래프/지도)하여 건축 관련 의사결정 인사이트를 도출할 수 있습니다.',
-                        days: [
-                            { day: '1일차 (오프라인 실습) - 건축과 AI 데이터', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 AI가 설계한 건축 이미지 감상, AI 건축 활용 사례 탐구', method: '강의/토의 (오프라인)' }, { time: '2교시 (1H)', content: '건축 데이터(정량, 위치, 시계열) 종류 파악 및 "건축 의사결정"에서 데이터의 중요성 안내', method: '강의/안내 (오프라인)' }, { time: '3교시 (1H)', content: 'ChatGPT를 활용한 AI 건축 미래 상상 토론 및 1일차 성찰일지 작성', method: '조별토의 (오프라인)' } ] },
-                            { day: '2일차 (오프라인 실습) - 건축 데이터 탐색', lessons: [ { time: '1교시 (1H)', content: 'Google Colab 환경 세팅 및 강사가 준비한 "완성된 건축 데이터셋(좌표 포함 CSV)" 업로드', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: 'Pandas 라이브러리 기초: 데이터 불러오기 및 구조(info, describe) 파악', method: '코드복붙 (오프라인)' }, { time: '3교시 (1H)', content: '조건 필터링, 정렬을 활용하여 "어떤 건물을 지을지" 의사결정을 위한 핵심 정보 탐색 실습', method: '개인실습 (오프라인)' } ] },
-                            { day: '3일차 (온라인) - 데이터 시각화', lessons: [ { time: '1교시 (1H)', content: '데이터 시각화 필요성 및 Matplotlib 기초: 용도별 건물 수 막대그래프 시각화 실습', method: '이론/실습 (온라인)' }, { time: '2교시 (1H)', content: 'Matplotlib 히스토그램을 활용한 건물 층수 분포 시각화 및 동네별 특성 시각적 해석', method: '온라인실습' }, { time: '3교시 (1H)', content: 'Matplotlib 산점도를 활용한 층수-면적 상관관계 분석 및 "의사결정" 관련 퀴즈 풀이(LMS)', method: '이론/평가 (온라인)' } ] },
-                            { day: '4일차 (오프라인 실습) - 지도 시각화', lessons: [ { time: '1교시 (1H)', content: '공간 데이터 시각화 동기유발 및 Folium 라이브러리를 활용한 기본 지도/마커 생성', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '완성된 데이터셋의 위도/경도를 활용한 다중 마커 표시 및 건축물 정보 팝업 띄우기 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Folium 히트맵(HeatMap)을 활용한 건물 밀집 지역 시각화 및 "건축 입지 의사결정" 토의', method: '해석토의 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습) - 미니 프로젝트 발표', lessons: [ { time: '1교시 (1H)', content: '미니 프로젝트 목표("건축 의사결정 제안") 및 루브릭 안내, 조별 분석 결과 최종 정리', method: '조별실습 (오프라인)' }, { time: '2교시 (1H)', content: '조별 건축 데이터 분석 인사이트("어디에 어떤 건물을 지을 것인가?") 발표 진행 및 동료 피드백', method: '발표/평가 (오프라인)' }, { time: '3교시 (1H)', content: '우수팀 시상 및 강사 총평, \'데이터 기반 건축 의사결정\' 과정 최종 성찰일지 작성 및 수료', method: '마무리 (오프라인)' } ] }
-                        ]
-                    }
-                ]
-            }
+            if (val === '으뜸') selectElement.classList.add('sel-manager-eu');
+            else if (val === '페픽') selectElement.classList.add('sel-manager-pe');
+            else if (val === 'AWS') selectElement.classList.add('sel-manager-aws');
+            else if (val === 'NHN') selectElement.classList.add('sel-manager-nhn');
+            else if (val.includes('[1학기]')) selectElement.classList.add('sel-course-1');
+            else if (val.includes('[2학기]')) selectElement.classList.add('sel-course-2');
         };
 
         // DOM Loaded Init
         document.addEventListener('DOMContentLoaded', () => {
             const detailView = document.getElementById('view-detail');
-            if(detailView && detailView?.classList?.contains('active')) {
+            if(detailView && detailView.classList.contains('active')) {
                 window.showTrack('common');
             }
 
-            // 동적으로 테이블 행 생성 (1학기, 2학기)
             const tbody1 = document.getElementById('tbody-sem1');
             const tbody2 = document.getElementById('tbody-sem2');
-            if(tbody1) tbody1.innerHTML = generateTableRows(1, '2026-04-27');
-            if(tbody2) tbody2.innerHTML = generateTableRows(2, '2026-09-01'); // 2학기 임시 시작일
+            if(tbody1) tbody1.innerHTML = window.generateTableRows(1, '2026-04-27');
+            if(tbody2) tbody2.innerHTML = window.generateTableRows(2, '2026-08-31'); 
 
-            // Event Delegation을 통한 이벤트 처리 (동적으로 추가된 행까지 완벽 지원)
             const scheduleContainer = document.getElementById('view-schedule');
             
             if(scheduleContainer) {
@@ -1194,19 +1190,19 @@
                     if (e.target.classList.contains('course-select')) {
                         const val = e.target.value;
                         if (val) {
-                            const counts = getCounts();
+                            const counts = window.getCounts();
                             if (counts[val] > courseLimits[val]) {
-                                showWarningToast(val, courseLimits[val]);
+                                window.showWarningToast(val, courseLimits[val]);
                                 e.target.value = e.target.prevValue || ""; 
-                                updateSelectColor(e.target); 
+                                window.updateSelectColor(e.target); 
                                 return; 
                             }
                         }
                         e.target.prevValue = e.target.value;
-                        updateSelectColor(e.target);
-                        updateAllocationStatus();
+                        window.updateSelectColor(e.target);
+                        window.updateAllocationStatus();
                     } else if (e.target.classList.contains('manager-select')) {
-                        updateSelectColor(e.target);
+                        window.updateSelectColor(e.target);
                     } else if (e.target.classList.contains('date-input')) {
                         window.updateRowStyle(e.target);
                     }
@@ -1214,10 +1210,9 @@
                 });
             }
 
-            // 초기 로딩 시 휴일/색상 스타일 세팅
             document.querySelectorAll('.date-input').forEach(inp => window.updateRowStyle(inp));
             
-            updateAllocationStatus();
+            window.updateAllocationStatus();
         });
     </script>
 
