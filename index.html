@@ -285,6 +285,9 @@
             <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 mb-8">
                 <div class="flex items-center mb-2">
                     <h2 class="text-3xl font-extrabold text-slate-800">과정 전체 일정표</h2>
+                    <span id="sync-status" class="ml-4 px-3 py-1 bg-slate-100 text-slate-500 text-xs rounded-full font-semibold border border-slate-200">
+                        <i class="fas fa-spinner fa-spin mr-1"></i>클라우드 연결 중...
+                    </span>
                 </div>
                 <p class="mb-6 text-slate-600 text-sm md:text-base">빈칸에 과목과 담당자를 선택하여 진도를 기입하세요. 날짜를 클릭하면 달력이 팝업되며, <strong>날짜 옆 '+' 버튼을 눌러 하루에 여러 강의를 추가할 수 있습니다.</strong></p>
                 
@@ -1209,12 +1212,71 @@
                     } else if (e.target.classList.contains('date-input')) {
                         window.updateRowStyle(e.target);
                     }
+                    if (window.saveToFirebase) window.saveToFirebase();
                 });
             }
 
             document.querySelectorAll('.date-input').forEach(inp => window.updateRowStyle(inp));
             
             window.updateAllocationStatus();
+        });
+    </script>
+
+    <!-- Firebase 실시간 동기화 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const app = initializeApp({
+            apiKey: "AIzaSyANPrIr15MOuZizIgDRGvM8g7heWxNeF1A",
+            authDomain: "gju-boot.firebaseapp.com",
+            projectId: "gju-boot",
+            storageBucket: "gju-boot.firebasestorage.app",
+            messagingSenderId: "711739159996",
+            appId: "1:711739159996:web:60b6abf5338f825e2b27b9"
+        });
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const docRef = doc(db, 'artifacts', 'gju-bootcamp-schedule', 'public', 'data', 'schedule', 'global_state');
+        let isSyncing = false;
+
+        // select, note input만 저장 (date-input 제외 - 날짜는 고정값)
+        window.saveToFirebase = async function() {
+            if (isSyncing || !auth.currentUser) return;
+            const state = {};
+            let idx = 0;
+            document.querySelectorAll('#view-schedule select, #view-schedule input').forEach(el => {
+                if (el.classList.contains('date-input')) return;
+                state[`f_${idx++}`] = el.value;
+            });
+            try { await setDoc(docRef, state); } catch(e) { console.error(e); }
+        };
+
+        function applyState(data) {
+            isSyncing = true;
+            let idx = 0;
+            document.querySelectorAll('#view-schedule select, #view-schedule input').forEach(el => {
+                if (el.classList.contains('date-input')) return;
+                const v = data[`f_${idx++}`];
+                if (v !== undefined && el.value !== v) {
+                    el.value = v;
+                    if (el.tagName === 'SELECT') window.updateSelectColor && window.updateSelectColor(el);
+                }
+            });
+            window.updateAllocationStatus && window.updateAllocationStatus();
+            isSyncing = false;
+        }
+
+        signInAnonymously(auth);
+        onAuthStateChanged(auth, user => {
+            if (!user) return;
+            const el = document.getElementById('sync-status');
+            if (el) {
+                el.innerHTML = '<i class="fas fa-cloud text-emerald-500 mr-1"></i>실시간 동기화 됨';
+                el.classList.replace('text-slate-500', 'text-emerald-600');
+            }
+            onSnapshot(docRef, snap => { if (snap.exists()) applyState(snap.data()); });
         });
     </script>
 </body>
