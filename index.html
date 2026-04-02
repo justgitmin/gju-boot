@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>첨단분야 인재양성 부트캠프 웹 계획서</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding-top: 70px;
+        }
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1e293b;
+            color: white;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .nav-btn {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-btn:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.05);
+        }
+        .nav-btn.active {
+            color: #38bdf8;
+            border-bottom-color: #38bdf8;
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        /* View Management */
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Utilities */
+        .day-badge-on { @apply font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded text-xs border border-indigo-100 min-w-[70px] text-center inline-block; }
+        .day-badge-off { @apply font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-xs border border-slate-200 min-w-[70px] text-center inline-block; }
+        
+        /* Select & Input Reset */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="%2364748b" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4H4z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            padding-right: 1.5rem !important;
+        }
+        select:focus, input[type="date"]:focus, input[type="text"]:focus {
+            outline: 2px solid #cbd5e1;
+            border-radius: 4px;
+        }
+
+        /* Dynamic Select Colors */
+        .sel-course-1 { background-color: #eff6ff !important; color: #1d4ed8 !important; font-weight: bold; border-radius: 0.25rem; }
+        .sel-course-2 { background-color: #e0e7ff !important; color: #4338ca !important; font-weight: bold; border-radius: 0.25rem; }
+        .sel-manager-eu { background-color: #f3e8ff !important; color: #7e22ce !important; font-weight: bold; border-radius: 0.25rem; }
+        .sel-manager-pe { background-color: #d1fae5 !important; color: #047857 !important; font-weight: bold; border-radius: 0.25rem; }
+        .sel-manager-aws { background-color: #ffedd5 !important; color: #c2410c !important; font-weight: bold; border-radius: 0.25rem; }
+        .sel-manager-nhn { background-color: #dbeafe !important; color: #1e40af !important; font-weight: bold; border-radius: 0.25rem; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Toast Notification -->
+    <div id="toast-message" class="fixed top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 opacity-0 -translate-y-4 pointer-events-none z-[100] flex items-center font-bold text-white">
+        <i id="toast-icon" class="mr-2"></i>
+        <span id="toast-text" class="whitespace-pre-line text-center">메시지</span>
+    </div>
+
+    <!-- Reset Confirm Modal -->
+    <div id="reset-modal" class="fixed inset-0 z-[200] bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="reset-modal-content">
+            <h3 class="text-lg font-bold text-slate-800 mb-2"><i class="fas fa-undo-alt mr-2 text-red-500"></i>일정 초기화</h3>
+            <p class="text-slate-600 text-sm mb-6">배정된 모든 강의 일정을 정말로 초기화하시겠습니까?<br>추가된 모든 행도 함께 삭제됩니다.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeResetModal()" class="px-4 py-2 text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">취소</button>
+                <button onclick="executeReset()" class="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors cursor-pointer">초기화 진행</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar flex items-center justify-center sm:justify-start px-4 sm:px-8">
+        <div class="flex items-center mr-8 hidden md:flex">
+            <i class="fas fa-graduation-cap text-2xl text-blue-400 mr-2"></i>
+            <span class="font-extrabold text-xl tracking-tight">부트캠프 <span class="font-light text-slate-400">Hub</span></span>
+        </div>
+        <div class="flex space-x-2 overflow-x-auto">
+            <button class="nav-btn active whitespace-nowrap" onclick="switchView('home')" id="nav-home">홈</button>
+            <button class="nav-btn whitespace-nowrap" onclick="switchView('schedule')" id="nav-schedule">강의 일정표</button>
+            <button class="nav-btn whitespace-nowrap" onclick="switchView('daily')" id="nav-daily">일차별 커리큘럼</button>
+            <button class="nav-btn whitespace-nowrap" onclick="switchView('detail')" id="nav-detail">상세 일차별 설계</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+        
+        <!-- ==========================================
+             VIEW 1: 홈 (Home)
+             ========================================== -->
+        <div id="view-home" class="view-section active">
+            <div class="bg-white shadow-xl rounded-2xl overflow-hidden mb-8">
+                <!-- Header -->
+                <header class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white p-10">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="inline-block py-1 px-3 rounded-full bg-blue-700 text-blue-100 text-sm font-semibold tracking-wider mb-4 border border-blue-500">
+                                2026 첨단분야 인재양성 사업 - 광주대학교
+                            </span>
+                            <h1 class="text-4xl font-extrabold mb-2 leading-tight">AI·클라우드 부트캠프 실행 계획서</h1>
+                        </div>
+                        <div class="hidden md:flex flex-col items-end space-y-2">
+                            <div class="bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm border border-white/20 text-right">
+                                <p class="text-xs text-blue-200">총 교육 시간 (1일 3시간 기준)</p>
+                                <p class="text-2xl font-bold">210 <span class="text-base font-normal">시간 (70일차)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Executive Summary -->
+                <section class="p-10 border-b border-slate-100">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 border-l-4 border-indigo-600 pl-3">핵심 운영 전략</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-100 hover:-translate-y-1 transition duration-300">
+                            <div class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl mb-4 shadow-md">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2 text-indigo-900">1. 통합 AI 플랫폼 'weeai' 도입</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                비전공자의 코딩 장벽을 해소하기 위해 AI 에이전트 통합 플랫폼 <strong>weeai</strong>를 전면 도입합니다. 복잡한 환경 설정 없이 다양한 LLM을 테스트하고, 맞춤형 AI를 직관적으로 구축합니다.
+                            </p>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-6 border border-blue-100 hover:-translate-y-1 transition duration-300">
+                            <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-xl mb-4 shadow-md">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2 text-blue-900">2. AWS & NHN Cloud 산학협력</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                글로벌 표준인 <strong>AWS</strong>와 국내 공공/금융 인프라를 주도하는 <strong>NHN Cloud</strong>를 동시 활용하는 멀티 클라우드 커리큘럼을 구성하여 실무 중심의 인프라 구축 역량을 강화합니다.
+                            </p>
+                        </div>
+                        <div class="bg-emerald-50 rounded-xl p-6 border border-emerald-100 hover:-translate-y-1 transition duration-300">
+                            <div class="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center text-white text-xl mb-4 shadow-md">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h3 class="font-bold text-lg mb-2 text-emerald-900">3. 1일 3시간 모듈형 실습</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                모든 교과목은 <strong>하루 3시간(1일차) 단위</strong>로 블록화되어 있습니다. 온라인 선행 이론 1일과 나머지 실무 오프라인 실습을 통해 효율적인 블렌디드 러닝을 구현합니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Curriculum Table Overview -->
+                <section class="p-10 bg-slate-50">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-6 border-l-4 border-indigo-600 pl-3">과정 요약표 (일 3H 단위)</h2>
+                    <div class="overflow-x-auto rounded-xl shadow-sm border border-slate-200">
+                        <table class="w-full text-left border-collapse bg-white">
+                            <thead>
+                                <tr class="bg-slate-200 text-slate-700 text-sm uppercase tracking-wider">
+                                    <th class="p-4 font-semibold w-1/5">과정 구분</th>
+                                    <th class="p-4 font-semibold w-2/5">세부 교과목명</th>
+                                    <th class="p-4 font-semibold text-center w-1/12">학기</th>
+                                    <th class="p-4 font-semibold text-center w-1/12">시수(일수)</th>
+                                    <th class="p-4 font-semibold text-center w-1/4">핵심 활용 기술</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <!-- 공통 -->
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-bold text-indigo-700 border-r border-slate-100" rowspan="2">공통(초급)</td>
+                                    <td class="p-4 font-medium text-orange-600">프롬프트엔지니어링(몰입)</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">weeai</span>, ChatGPT</td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-orange-600">AI 디자인 씽킹(몰입)</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">weeai</span>, Miro</td>
+                                </tr>
+
+                                <!-- AI 데이터 SW -->
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-bold text-blue-700 border-r border-slate-100" rowspan="6">AI 데이터SW(컴공)</td>
+                                    <td class="p-4 font-medium text-blue-700">클라우드입문 (몰입)</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center"><span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">AWS</span></td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-orange-600">ML/딥러닝 기초</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center">Teachable Machine</td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-blue-700">LLM 애플리케이션(몰입)</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">30 (10일)</td>
+                                    <td class="p-4 text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">weeai</span>, Python</td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-blue-700">NHN/AWS 멀티 클라우드 운영(몰입)</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center"><span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">AWS</span>, <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">NHN Cloud</span></td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-blue-700">MLOps(몰입)</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center">Hugging Face, Github</td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-blue-700">Cloud Native 아키텍처(몰입)</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center">Docker, Linux, NHN Cloud</td>
+                                </tr>
+                                
+                                <!-- 제조 AI -->
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-bold text-emerald-700 border-r border-slate-100" rowspan="2">제조AI<br>(기계자동차)</td>
+                                    <td class="p-4 font-medium text-blue-700">제조설비 AI모델링</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">30 (10일)</td>
+                                    <td class="p-4 text-center">Google Colab, Python</td>
+                                </tr>
+                                <tr class="border-b border-slate-300 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-blue-700">Digital Twin 기반 공정 시뮬레이션</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">30 (10일)</td>
+                                    <td class="p-4 text-center">Python, SimPy</td>
+                                </tr>
+                                
+                                <!-- 건축 -->
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-4 font-bold text-rose-700 border-r border-slate-100">AIAD(건축)</td>
+                                    <td class="p-4 font-medium text-red-600">AI Data 분석 및 시각화</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-4 text-center">Python, Folium, Matplotlib</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-slate-800 text-white">
+                                    <td colspan="3" class="p-4 text-right font-bold tracking-wider">총계(시수)</td>
+                                    <td class="p-4 text-center font-extrabold text-lg text-yellow-400">210</td>
+                                    <td class="p-4"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 1.5: 일정표 (Schedule)
+             ========================================== -->
+        <div id="view-schedule" class="view-section">
+            <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 mb-8">
+                <div class="flex items-center mb-2">
+                    <h2 class="text-3xl font-extrabold text-slate-800">과정 전체 일정표</h2>
+                </div>
+                <p class="mb-6 text-slate-600 text-sm md:text-base">빈칸에 과목과 담당자를 선택하여 진도를 기입하세요. 날짜를 클릭하면 달력이 팝업되며, <strong>날짜 옆 '+' 버튼을 눌러 하루에 여러 강의를 추가할 수 있습니다.</strong></p>
+                
+                <!-- Allocation Dashboard -->
+                <div id="allocation-dashboard-container" class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2">
+                        <h3 class="font-bold text-slate-700 text-sm flex items-center"><i class="fas fa-chart-pie mr-2 text-indigo-500"></i>과정별 시수 배정 현황 (1일=3H)</h3>
+                        <div class="flex gap-2">
+                            <button onclick="resetSchedule()" class="px-3 py-1.5 bg-white text-slate-600 border border-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded text-xs font-bold transition-all flex items-center shadow-sm">
+                                <i class="fas fa-undo-alt mr-1.5"></i>전체 초기화
+                            </button>
+                        </div>
+                    </div>
+                    <div id="allocation-dashboard" class="flex flex-wrap gap-2">
+                        <!-- Badges injected here via JS -->
+                    </div>
+                </div>
+
+                <!-- 1학기 테이블 -->
+                <h3 class="text-xl font-bold text-slate-800 mb-4 mt-8 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> 1학기 강의 일정</h3>
+                <div class="overflow-x-auto rounded-xl shadow-sm border border-slate-200 mb-10">
+                    <table class="w-full border-collapse bg-white">
+                        <thead>
+                            <tr class="bg-slate-800 text-white text-sm tracking-wider text-center">
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 8%;">주차</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 16%;">날짜</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 8%;">요일</th>
+                                <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 38%;">1학기 과정 배정</th>
+                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 12%;">담당</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-slate-700" id="tbody-sem1">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 2학기 테이블 -->
+                <h3 class="text-xl font-bold text-slate-800 mb-4 mt-12 flex items-center"><i class="fas fa-calendar-alt text-indigo-600 mr-2"></i> 2학기 강의 일정</h3>
+                <div class="overflow-x-auto rounded-xl shadow-sm border border-slate-200">
+                    <table class="w-full border-collapse bg-white">
+                        <thead>
+                            <tr class="bg-slate-800 text-white text-sm tracking-wider text-center">
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 8%;">주차</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 16%;">날짜</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 8%;">요일</th>
+                                <th class="p-3 border border-slate-700 bg-indigo-900 font-bold text-indigo-100" style="width: 38%;">2학기 과정 배정</th>
+                                <th class="p-3 border border-slate-700 bg-indigo-800 font-bold text-indigo-100" style="width: 12%;">담당</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-slate-700" id="tbody-sem2">
+                            <!-- Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 2: 일차별 커리큘럼 (Daily Breakdown Overview)
+             ========================================== -->
+        <div id="view-daily" class="view-section">
+            <div class="bg-white shadow-xl rounded-2xl p-10">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-8 border-b-2 border-slate-100 pb-4">상세 커리큘럼 명세서 <span class="text-lg font-normal text-slate-500 ml-2">(요약 목록)</span></h2>
+                
+                <!-- Track 1 -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-extrabold text-indigo-800 mb-4 flex items-center bg-indigo-50 p-3 rounded-lg"><i class="fas fa-layer-group mr-3"></i> 공통(초급)</h3>
+                    <div class="space-y-4 pl-4 border-l-2 border-indigo-100 ml-2">
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex justify-between">1. [1학기] 프롬프트엔지니어링(몰입) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~2일차(오프)</span> <div>오리엔테이션, LLM 원리 이해, 좋은 프롬프트 3요소 및 비교 실습</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">3일차(온)</span> <div>역할/맥락 부여, 형식 지정 및 CoT(단계별 사고) 프롬프팅 학습</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">4~5일차(오프)</span> <div>상황별 실전 프롬프트 적용 및 나만의 프롬프트 북 제작/발표</div></li>
+                            </ul>
+                        </div>
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex justify-between">2. [2학기] AI 디자인 씽킹(몰입) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, 주변 문제 정의 및 협업 툴(Miro) 세팅 안내</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>디자인 씽킹 프로세스 이해 및 AI 기획 트렌드 분석</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>weeai 활용 CJ 도출, 아이디에이션, 프로토타이핑 및 MVP 발표</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track 2 -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-extrabold text-blue-800 mb-4 flex items-center bg-blue-50 p-3 rounded-lg"><i class="fas fa-network-wired mr-3"></i> AI 데이터SW(컴공)</h3>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 pl-4 border-l-2 border-blue-100 ml-2">
+                        
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">1. [1학기] 클라우드입문 (몰입) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, AWS 계정 생성 및 첫 가상머신(EC2) 생성 맛보기</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>클라우드 필수 개념(IaaS/PaaS) 및 기본 아키텍처 이해</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>EC2 접속, IAM 보안, S3 호스팅 및 VPC 네트워크 실습</div></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">2. [1학기] ML/딥러닝 기초 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, 티처블머신 환경 세팅 및 객체 분류 모델 기초 실습</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>지도/비지도 학습 개념, 분류/회귀 이해, 전처리 및 평가 방법론</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>오렌지 데이터 마이닝 설치, 데이터 정제 및 코딩 없는 모델 시각화</div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border border-purple-200 bg-purple-50/30 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2"><span>3. [1학기] LLM 애플리케이션(몰입) <i class="fas fa-star text-yellow-400"></i></span> <span class="text-sm font-normal bg-purple-100 px-2 py-1 rounded text-purple-700 shrink-0">30H (10일) / 온3:오프27</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, 파이썬 환경(Colab) 구성, API Key 발급 및 테스트</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>파이썬 기초(변수/조건문/함수), 외부 라이브러리 및 JSON 개념 학습</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~10일차(오프)</span> <div>weeai 연동 터미널 챗봇, RAG 파이프라인 구축 및 Streamlit 웹 배포</div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">4. [2학기] NHN/AWS 멀티 클라우드 운영 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, NHN Cloud 콘솔 접속 및 네트워크(VPC) 맛보기 실습</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>K-클라우드 동향, NHN-AWS 용어 비교 및 아키텍처 보안 이론</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>NHN Cloud 실 인프라 구성, 로드밸런서 구축 및 멀티 클라우드 장애대응</div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">5. [2학기] MLOps(몰입) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, Git/Github 기초 세팅, 계정 연동 및 파이썬 소스 Push 실습</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>DevOps/MLOps 차이점 및 AI 모델 배포(Serving) 파이프라인 이론</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>Hugging Face 모델 탐색, Gradio UI 연동 및 Spaces 웹 서비스 실 배포</div></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">6. [2학기] Cloud Native 아키텍처 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, Docker Desktop 세팅 및 Nginx 컨테이너 띄우기 실습</div></li>
+                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>모놀리식 vs MSA, 컨테이너 개념, Docker 생명주기 및 네트워크 이해</div></li>
+                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>Docker 명령어 실습, 컨테이너 패키징 및 NHN Cloud 환경 실 배포</div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track 3 & 4 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Track 3 -->
+                    <div>
+                        <h3 class="text-xl font-extrabold text-emerald-800 mb-4 flex items-center bg-emerald-50 p-3 rounded-lg"><i class="fas fa-industry mr-3"></i> 제조AI(기계자동차)</h3>
+                        <div class="space-y-4 pl-4 border-l-2 border-emerald-100 ml-2">
+                            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                                <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">1. [1학기] 제조설비 AI모델링 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">30H (10일) / 온3:오프27</span></h4>
+                                <ul class="text-sm text-slate-600 space-y-2">
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~3일차(오프)</span> <div>제조 현장 이해, 센서 데이터 파악 및 파이썬 데이터 읽기 기초</div></li>
+                                    <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">4일차(온)</span> <div>센서 데이터 그래프 시각화 및 해석 분석에 집중</div></li>
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">5~10일차(오프)</span> <div>결측치 전처리, 이상 탐지 모델 학습/평가 및 결과물 발표</div></li>
+                                </ul>
+                            </div>
+                            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                                <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">2. [2학기] Digital Twin 기반 공정 시뮬레이션 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">30H (10일) / 온3:오프27</span></h4>
+                                <ul class="text-sm text-slate-600 space-y-2">
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, DT 개념, 아날로그 공정 체험 및 보드게임 실습</div></li>
+                                    <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>단순 공정 시뮬레이션 파이썬 코드 실행 및 결과 로그 시각적 해석</div></li>
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~10일차(오프)</span> <div>병목 현상 분석, 파라미터 최적화 실험, 결과 시각화 및 프로젝트 발표</div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Track 4 -->
+                    <div>
+                        <h3 class="text-xl font-extrabold text-rose-800 mb-4 flex items-center bg-rose-50 p-3 rounded-lg"><i class="fas fa-building mr-3"></i> AIAD(건축)</h3>
+                        <div class="space-y-4 pl-4 border-l-2 border-rose-100 ml-2">
+                            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
+                                <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">1. [1학기] AI Data 분석 및 시각화 <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
+                                <ul class="text-sm text-slate-600 space-y-2">
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~2일차(오프)</span> <div>오리엔테이션 및 "건축 의사결정"의 이해, 완성된 데이터셋 탐색 실습</div></li>
+                                    <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">3일차(온)</span> <div>Matplotlib 기초 및 용도별 건물 그래프 시각화, 상관관계 분석</div></li>
+                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">4~5일차(오프)</span> <div>Folium 공간 지도(좌표) 맵핑 실습 및 건축 의사결정 데이터 발표</div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             VIEW 3: 상세 일차별 설계 (Detailed Daily Table)
+             ========================================== -->
+        <div id="view-detail" class="view-section">
+            <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 min-h-[600px]">
+                <h2 class="text-3xl font-extrabold text-slate-800 mb-2">상세 일차별 설계</h2>
+                <p class="mb-6 text-slate-600 text-sm md:text-base">아래 대분류(트랙)를 선택한 후, 나타나는 상세 교과목을 클릭하여 1일 3시간 시간표를 확인하세요.</p>
+                
+                <!-- Track Selectors (대분류) -->
+                <div class="flex flex-wrap gap-2 md:gap-3 border-b border-slate-200 pb-4 mb-4">
+                    <button onclick="showTrack('common')" id="btn-common" class="px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer bg-indigo-100 text-indigo-800 border-indigo-300 shadow-md ring-1 ring-indigo-400">공통(초급)</button>
+                    <button onclick="showTrack('data')" id="btn-data" class="px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer bg-white text-blue-600 border-blue-200 hover:bg-blue-50">AI 데이터SW(컴공)</button>
+                    <button onclick="showTrack('factory')" id="btn-factory" class="px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50">제조AI(기계자동차)</button>
+                    <button onclick="showTrack('arch')" id="btn-arch" class="px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer bg-white text-rose-600 border-rose-200 hover:bg-rose-50">AIAD(건축)</button>
+                </div>
+
+                <!-- Course Sub-menu Selectors (소분류 - 동적 생성) -->
+                <div id="course-selector-container" class="flex flex-wrap gap-2 mb-8 hidden p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <!-- Javascript will inject sub-buttons here -->
+                </div>
+
+                <!-- Dynamic Detail Content Container -->
+                <div id="detailed-content-container">
+                    <!-- Javascript will inject the single course table here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 로컬 전용 자바스크립트 -->
+    <script>
+        // === Toast Notification ===
+        window.showToast = function(message, type = 'warning') {
+            const toast = document.getElementById('toast-message');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+
+            if(!toast || !icon || !text) return;
+
+            text.innerText = message;
+
+            if (type === 'warning') {
+                toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[100] flex items-center font-bold text-white bg-red-600/95 backdrop-blur opacity-100 translate-y-0';
+                icon.className = 'fas fa-exclamation-triangle mr-2 text-yellow-300';
+            } else {
+                toast.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[100] flex items-center font-bold text-white bg-emerald-600/95 backdrop-blur opacity-100 translate-y-0';
+                icon.className = 'fas fa-check-circle mr-2 text-emerald-200';
+            }
+
+            setTimeout(() => {
+                toast?.classList?.replace('opacity-100', 'opacity-0');
+                toast?.classList?.replace('translate-y-0', '-translate-y-4');
+                toast?.classList?.add('pointer-events-none');
+            }, 3000);
+        };
+
+        function showWarningToast(courseName, max) {
+            const cleanName = courseName.split('(')[0];
+            window.showToast(`${cleanName} 과정은 최대 ${max}일까지만 배정 가능합니다!`, 'warning');
+        }
+
+        // View Switcher
+        window.switchView = function(viewId) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn?.classList?.remove('active'));
+            document.getElementById(`nav-${viewId}`)?.classList?.add('active');
+
+            document.querySelectorAll('.view-section').forEach(view => {
+                view?.classList?.remove('active');
+            });
+            setTimeout(() => {
+                document.getElementById(`view-${viewId}`)?.classList?.add('active');
+            }, 10);
+
+            if (viewId === 'detail') {
+                const subMenuContainer = document.getElementById('course-selector-container');
+                if (subMenuContainer && subMenuContainer.children.length === 0) {
+                    window.showTrack('common');
+                }
+            }
+        };
+
+        // 데이터 및 색상 명시적 매핑
+        const colorMappings = {
+            indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-600', lightBg: 'bg-indigo-100', lightText: 'text-indigo-800', lightBorder: 'border-indigo-200', check: 'text-indigo-500', active: ['bg-indigo-600', 'text-white', 'border-indigo-600', 'transform', 'scale-[1.02]'] },
+            blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-600', lightBg: 'bg-blue-100', lightText: 'text-blue-800', lightBorder: 'border-blue-200', check: 'text-blue-500', active: ['bg-blue-600', 'text-white', 'border-blue-600', 'transform', 'scale-[1.02]'] },
+            emerald: { bg: 'bg-emerald-600', text: 'text-emerald-600', border: 'border-emerald-600', lightBg: 'bg-emerald-100', lightText: 'text-emerald-800', lightBorder: 'border-emerald-200', check: 'text-emerald-500', active: ['bg-emerald-600', 'text-white', 'border-emerald-600', 'transform', 'scale-[1.02]'] },
+            rose: { bg: 'bg-rose-600', text: 'text-rose-600', border: 'border-rose-600', lightBg: 'bg-rose-100', lightText: 'text-rose-800', lightBorder: 'border-rose-200', check: 'text-rose-500', active: ['bg-rose-600', 'text-white', 'border-rose-600', 'transform', 'scale-[1.02]'] }
+        };
+        const inactiveClasses = ["bg-white", "text-slate-600", "border-slate-300", "hover:bg-slate-100"];
+
+        window.showTrack = function(trackKey) {
+            const btnStyles = {
+                'common': { active: 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-md ring-1 ring-indigo-400', inactive: 'bg-white text-indigo-600 border-indigo-200 hover:bg-indigo-50' },
+                'data': { active: 'bg-blue-100 text-blue-800 border-blue-300 shadow-md ring-1 ring-blue-400', inactive: 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50' },
+                'factory': { active: 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-md ring-1 ring-emerald-400', inactive: 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-50' },
+                'arch': { active: 'bg-rose-100 text-rose-800 border-rose-300 shadow-md ring-1 ring-rose-400', inactive: 'bg-white text-rose-600 border-rose-200 hover:bg-rose-50' }
+            };
+            const baseClass = "px-4 py-2 rounded-lg font-bold text-sm border transition-all cursor-pointer";
+            Object.keys(btnStyles).forEach(key => {
+                const btn = document.getElementById(`btn-${key}`);
+                if(btn) {
+                    if(key === trackKey) btn.className = `${baseClass} ${btnStyles[key].active}`;
+                    else btn.className = `${baseClass} ${btnStyles[key].inactive}`;
+                }
+            });
+
+            const courseContainer = document.getElementById('course-selector-container');
+            if(!courseContainer) return;
+            
+            const data = curriculumData[trackKey];
+            courseContainer.innerHTML = ''; 
+            courseContainer?.classList?.remove('hidden');
+
+            data.courses.forEach((course, index) => {
+                const btn = document.createElement('button');
+                btn.className = `course-btn px-4 py-2 rounded-full text-sm font-semibold border transition-all cursor-pointer flex items-center shadow-sm`;
+                btn.id = `btn-course-${trackKey}-${index}`;
+                const displayName = course.name.split(' [')[0]; 
+                btn.innerHTML = `<i class="fas fa-bookmark opacity-50 mr-2 text-xs"></i>${displayName}`;
+                btn.onclick = () => window.showCourse(trackKey, index);
+                courseContainer.appendChild(btn);
+            });
+
+            if (data.courses.length > 0) window.showCourse(trackKey, 0);
+            else {
+                const container = document.getElementById('detailed-content-container');
+                if (container) container.innerHTML = '';
+            }
+        };
+
+        window.showCourse = function(trackKey, courseIndex) {
+            const data = curriculumData[trackKey];
+            const course = data.courses[courseIndex];
+            const theme = colorMappings[data.color];
+
+            document.querySelectorAll('.course-btn').forEach(btn => {
+                btn?.classList?.remove(...colorMappings['indigo'].active, ...colorMappings['blue'].active, ...colorMappings['emerald'].active, ...colorMappings['rose'].active);
+                btn?.classList?.add(...inactiveClasses);
+                const icon = btn.querySelector('i');
+                if(icon) {
+                    icon?.classList?.remove('opacity-100');
+                    icon?.classList?.add('opacity-50');
+                }
+            });
+
+            const activeBtn = document.getElementById(`btn-course-${trackKey}-${courseIndex}`);
+            if (activeBtn) {
+                activeBtn?.classList?.remove(...inactiveClasses);
+                activeBtn?.classList?.add(...theme.active);
+                const icon = activeBtn.querySelector('i');
+                if(icon) {
+                    icon?.classList?.remove('opacity-50');
+                    icon?.classList?.add('opacity-100');
+                }
+            }
+
+            const container = document.getElementById('detailed-content-container');
+            if(!container) return;
+
+            let html = `
+            <div class="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm animate-[fadeIn_0.3s_ease-out]">
+                <div class="bg-slate-200 px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm mr-4">
+                            <i class="fas fa-book-open ${theme.text} text-lg"></i>
+                        </div>
+                        <h4 class="font-extrabold text-xl text-slate-800 tracking-tight">${course.name.split(' [')[0]}</h4>
+                    </div>
+                    <span class="bg-slate-600 text-white text-xs font-bold px-3 py-1 rounded-full">${course.name.split(' [')[1]?.replace(']', '') || ''}</span>
+                </div>
+                <div class="bg-white px-6 py-4 border-b border-slate-200">
+                    <div class="flex items-start">
+                        <div class="${theme.check} mt-0.5 mr-3 text-lg"><i class="fas fa-bullseye"></i></div>
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-700 mb-1">과정 목표</h5>
+                            <p class="text-sm text-slate-600 leading-relaxed">${course.goal}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 space-y-8">
+            `;
+            
+            course.days.forEach(day => {
+                const isOnline = day.day.includes('온라인');
+                const badgeClass = isOnline ? `${theme.lightBg} ${theme.lightText} ${theme.lightBorder}` : 'bg-slate-700 text-white border-slate-800';
+                
+                html += `
+                    <div>
+                        <div class="flex items-center mb-3">
+                            <h5 class="font-bold text-base px-3 py-1.5 rounded border ${badgeClass} shadow-sm">${day.day}</h5>
+                            <div class="flex-1 border-b border-slate-200 ml-4"></div>
+                        </div>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+                            <table class="w-full text-left text-sm bg-white">
+                                <thead class="bg-slate-100 text-slate-600">
+                                    <tr>
+                                        <th class="p-3.5 w-1/5 border-b font-bold tracking-wide min-w-[100px]">시간</th>
+                                        <th class="p-3.5 w-3/5 border-b font-bold tracking-wide">수업 내용</th>
+                                        <th class="p-3.5 w-1/5 border-b font-bold tracking-wide text-center min-w-[120px]">진행 방법</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                `;
+                
+                day.lessons.forEach(lesson => {
+                    html += `
+                                    <tr class="hover:bg-slate-50 transition-colors">
+                                        <td class="p-3.5 ${theme.text} font-semibold bg-slate-50/50">${lesson.time}</td>
+                                        <td class="p-3.5 text-slate-800 font-medium leading-relaxed">${lesson.content}</td>
+                                        <td class="p-3.5 text-center text-slate-600 text-xs font-semibold">
+                                            <span class="bg-white border border-slate-200 px-2.5 py-1 rounded shadow-sm inline-block">${lesson.method}</span>
+                                        </td>
+                                    </tr>
+                    `;
+                });
+
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <div class="text-center mt-8 pt-5 border-t border-slate-200 bg-slate-100 rounded-lg p-3">
+                        <span class="text-sm font-medium text-slate-600"><i class="fas fa-check-circle mr-2 ${theme.check}"></i>본 상세 설계는 1일 3시간(1교시=1H) 기준으로 기획된 본 과정의 <strong>전체 일정표</strong>입니다.</span>
+                    </div>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+        };
+
+        // === Schedule Dynamic Generation ===
+        const holidays2026 = {
+            '2026-05-01': '근로자의 날',
+            '2026-05-05': '어린이날',
+            '2026-05-25': '부처님오신날(대체)',
+            '2026-09-23': '추석 연휴',
+            '2026-09-24': '추석 연휴',
+            '2026-09-25': '추석 연휴',
+            '2026-10-03': '개천절',
+            '2026-10-09': '한글날',
+            '2026-12-25': '성탄절'
+        };
+
+        function generateTableRows(semester, startDateStr) {
+            let html = '';
+            let [y, m, dayOfMonth] = startDateStr.split('-');
+            let currDate = new Date(y, m - 1, dayOfMonth);
+            let rowIdx = 0;
+            
+            for (let w = 1; w <= 5; w++) {
+                for (let d = 1; d <= 5; d++) {
+                    // Skip weekends
+                    while(currDate.getDay() === 0 || currDate.getDay() === 6) {
+                        currDate.setDate(currDate.getDate() + 1);
+                    }
+                    
+                    const year = currDate.getFullYear();
+                    const month = String(currDate.getMonth() + 1).padStart(2, '0');
+                    const dateNum = String(currDate.getDate()).padStart(2, '0');
+                    const dateStr = `${year}-${month}-${dateNum}`;
+
+                    const dayIdx = currDate.getDay();
+                    const dayStr = ['일','월','화','수','목','금','토'][dayIdx];
+                    const holidayName = holidays2026[dateStr] || '';
+                    const isHoliday = !!holidayName;
+                    
+                    const courseOpts = semester === 1 
+                        ? `<option value="">과정 선택</option><option>[1학기] 프롬프트엔지니어링(15H)</option><option>[1학기] 클라우드입문(15H)</option><option>[1학기] ML/딥러닝 기초(15H)</option><option>[1학기] LLM 애플리케이션(30H)</option><option>[1학기] 제조설비 AI모델링(30H)</option><option>[1학기] AI Data 분석(15H)</option>`
+                        : `<option value="">과정 선택</option><option>[2학기] AI 디자인 씽킹(15H)</option><option>[2학기] NHN/AWS 멀티클라우드(15H)</option><option>[2학기] MLOps(15H)</option><option>[2학기] Cloud Native(15H)</option><option>[2학기] Digital Twin(30H)</option>`;
+                        
+                    const weekText = d === 1 ? `${w}주차` : '';
+                    const weekCell = `<td class="p-2 border-r ${isHoliday?'border-red-200':'border-slate-200'} font-bold ${isHoliday?'':'bg-slate-100 text-slate-800'} text-center week-cell align-middle">${weekText}</td>`;
+                    
+                    const trClass = isHoliday ? "bg-red-50 transition border-b border-red-200" : "hover:bg-slate-50 transition border-b border-slate-200";
+                    const tdClass = isHoliday ? "border-red-200" : "border-slate-200";
+                    const textClass = isHoliday ? "text-red-600 font-bold" : "text-slate-700";
+                    const bgClassC = isHoliday ? "" : (semester === 1 ? "bg-blue-50/20" : "bg-indigo-50/20");
+                    const bgClassM = isHoliday ? "" : (semester === 1 ? "bg-blue-50/40" : "bg-indigo-50/40");
+
+                    html += `
+                    <tr class="${trClass}">
+                        ${weekCell}
+                        <td class="p-1 border-r ${tdClass} align-middle">
+                            <div class="flex items-center justify-center gap-1">
+                                <input type="date" class="date-input w-full max-w-[110px] bg-transparent outline-none text-xs text-center cursor-pointer ${textClass}" value="${dateStr}">
+                                <button type="button" onclick="addDailyRow(this)" class="text-indigo-500 hover:text-white hover:bg-indigo-500 bg-indigo-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors" title="이 날짜에 강의 추가">
+                                    <i class="fas fa-plus text-[10px]"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="p-2 border-r ${tdClass} text-center text-xs ${textClass} align-middle"><span class="day-label">${dayStr}</span></td>
+                        <td class="p-1 border-r ${tdClass} ${bgClassC} align-middle">
+                            <select class="course-select w-full bg-transparent outline-none border-none text-xs cursor-pointer px-2 ${textClass}">
+                                ${courseOpts}
+                            </select>
+                        </td>
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
+                            <select class="manager-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
+                                <option value="">-</option><option>으뜸</option><option>페픽</option><option>AWS</option><option>NHN</option>
+                            </select>
+                        </td>
+                        <td class="p-1 text-xs text-center border-slate-200 align-middle">
+                            <input type="text" class="note-input w-full bg-transparent outline-none text-center ${isHoliday?'text-red-500 font-bold':'text-slate-500'}" value="${holidayName}" placeholder="비고">
+                        </td>
+                    </tr>`;
+                    
+                    currDate.setDate(currDate.getDate() + 1);
+                    rowIdx++;
+                }
+            }
+            return html;
+        }
+
+        window.addDailyRow = function(btn) {
+            const tr = btn.closest('tr');
+            const clone = tr.cloneNode(true);
+            clone.classList.add('dynamic-row'); 
+            
+            const btnContainer = clone.querySelector('div.flex');
+            const actionBtn = btnContainer.querySelector('button');
+            actionBtn.setAttribute('onclick', 'removeDailyRow(this)');
+            actionBtn.className = 'text-rose-500 hover:text-white hover:bg-rose-500 bg-rose-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors';
+            actionBtn.innerHTML = '<i class="fas fa-minus text-[10px]"></i>';
+            actionBtn.title = '이 강의 행 삭제';
+
+            const weekCell = clone.querySelector('.week-cell');
+            if(weekCell) weekCell.innerHTML = '';
+
+            clone.querySelectorAll('select').forEach(sel => {
+                sel.value = '';
+                sel.className = sel.className.replace(/sel-course-\d|sel-manager-[a-z]+/g, '').trim();
+            });
+            
+            clone.querySelectorAll('.note-input').forEach(inp => {
+                if(inp.placeholder === '비고') inp.value = '';
+            });
+
+            const dateInput = clone.querySelector('.date-input');
+            if (dateInput) {
+                dateInput.setAttribute('readonly', 'true');
+                dateInput.classList.add('pointer-events-none', 'opacity-60');
+                dateInput.classList.remove('cursor-pointer');
+            }
+
+            tr.after(clone);
+            updateAllocationStatus(); 
+        };
+
+        window.removeDailyRow = function(btn) {
+            const tr = btn.closest('tr');
+            tr.remove();
+            updateAllocationStatus(); 
+        };
+
+        window.updateRowStyle = function(dateInput) {
+            const dateVal = dateInput.value;
+            const tr = dateInput.closest('tr');
+            if(!tr || !dateVal) return;
+
+            const dayLabel = tr.querySelector('.day-label');
+            const noteInput = tr.querySelector('.note-input');
+            const selects = tr.querySelectorAll('select');
+            
+            const d = new Date(dateVal);
+            const dayIdx = d.getDay();
+            if(dayLabel) dayLabel.innerText = ['일','월','화','수','목','금','토'][dayIdx];
+            
+            const isWeekend = dayIdx === 0 || dayIdx === 6;
+            const holidayName = holidays2026[dateVal] || '';
+            const isHoliday = !!holidayName || isWeekend;
+            
+            if (isHoliday) {
+                tr.classList.add('bg-red-50', 'border-red-200');
+                tr.classList.remove('hover:bg-slate-50', 'border-slate-200');
+                dateInput.classList.add('text-red-600', 'font-bold');
+                dateInput.classList.remove('text-slate-700');
+                if(dayLabel) {
+                    dayLabel.parentElement.classList.add('text-red-600', 'font-bold');
+                    dayLabel.parentElement.classList.remove('text-slate-700');
+                }
+                selects.forEach(s => {
+                    s.classList.add('text-red-600');
+                    s.classList.remove('text-slate-700');
+                    s.parentElement.classList.remove('bg-blue-50/20', 'bg-blue-50/40', 'bg-indigo-50/20', 'bg-indigo-50/40');
+                });
+                if(noteInput) {
+                    noteInput.classList.add('text-red-500', 'font-bold');
+                    noteInput.classList.remove('text-slate-500');
+                    if(holidayName && !noteInput.value) noteInput.value = holidayName;
+                }
+            } else {
+                tr.classList.remove('bg-red-50', 'border-red-200');
+                tr.classList.add('hover:bg-slate-50', 'border-slate-200');
+                dateInput.classList.remove('text-red-600', 'font-bold');
+                dateInput.classList.add('text-slate-700');
+                if(dayLabel) {
+                    dayLabel.parentElement.classList.remove('text-red-600', 'font-bold');
+                    dayLabel.parentElement.classList.add('text-slate-700');
+                }
+                selects.forEach(s => {
+                    s.classList.remove('text-red-600');
+                    s.classList.add('text-slate-700');
+                    const isSem1 = tr.id?.includes('s1') || tr.closest('tbody')?.id === 'tbody-sem1';
+                    if(s.classList.contains('course-select')) s.parentElement.classList.add(isSem1 ? 'bg-blue-50/20' : 'bg-indigo-50/20');
+                    if(s.classList.contains('manager-select')) s.parentElement.classList.add(isSem1 ? 'bg-blue-50/40' : 'bg-indigo-50/40');
+                });
+                if(noteInput) {
+                    noteInput.classList.remove('text-red-500', 'font-bold');
+                    noteInput.classList.add('text-slate-500');
+                    if(noteInput.value === '어린이날' || noteInput.value === '근로자의 날' || noteInput.value.includes('부처님') || noteInput.value.includes('추석') || noteInput.value.includes('한글날') || noteInput.value.includes('개천절')) noteInput.value = '';
+                }
+            }
+        };
+
+        window.resetSchedule = function() {
+            const modal = document.getElementById('reset-modal');
+            if(modal) {
+                modal?.classList?.remove('hidden');
+                void modal.offsetWidth;
+                modal?.classList?.remove('opacity-0');
+                const content = document.getElementById('reset-modal-content');
+                if(content) content?.classList?.remove('scale-95');
+            }
+        };
+
+        window.closeResetModal = function() {
+            const modal = document.getElementById('reset-modal');
+            if(modal) {
+                modal?.classList?.add('opacity-0');
+                const content = document.getElementById('reset-modal-content');
+                if(content) content?.classList?.add('scale-95');
+                setTimeout(() => {
+                    modal?.classList?.add('hidden');
+                }, 300);
+            }
+        };
+
+        window.executeReset = function() {
+            document.querySelectorAll('.dynamic-row').forEach(row => row.remove());
+            
+            const selects = document.querySelectorAll('#view-schedule .course-select, #view-schedule .manager-select');
+            selects.forEach(el => {
+                el.value = "";
+                if(el.classList.contains('course-select')) el.prevValue = "";
+                updateSelectColor(el);
+            });
+            
+            updateAllocationStatus();
+            window.closeResetModal();
+        };
+
+        const courseLimits = {
+            '[1학기] 프롬프트엔지니어링(15H)': 5,
+            '[1학기] 클라우드입문(15H)': 5,
+            '[1학기] ML/딥러닝 기초(15H)': 5,
+            '[1학기] LLM 애플리케이션(30H)': 10,
+            '[1학기] 제조설비 AI모델링(30H)': 10,
+            '[1학기] AI Data 분석(15H)': 5,
+            '[2학기] AI 디자인 씽킹(15H)': 5,
+            '[2학기] NHN/AWS 멀티클라우드(15H)': 5,
+            '[2학기] MLOps(15H)': 5,
+            '[2학기] Cloud Native(15H)': 5,
+            '[2학기] Digital Twin(30H)': 10
+        };
+
+        function getCounts() {
+            const selects = document.querySelectorAll('.course-select');
+            let counts = {};
+            Object.keys(courseLimits).forEach(k => counts[k] = 0);
+            selects.forEach(sel => {
+                if (sel.value && counts[sel.value] !== undefined) {
+                    counts[sel.value]++;
+                }
+            });
+            return counts;
+        }
+
+        function updateAllocationStatus() {
+            const counts = getCounts();
+            let html = '';
+            for(let course in courseLimits) {
+                let max = courseLimits[course];
+                let current = counts[course];
+                
+                let badgeColor = 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'; 
+                if (current === max) badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-300 font-bold'; 
+                
+                let shortName = course.split('(')[0].replace(/\[.*?\] /, ''); 
+                html += `<span class="px-3 py-1.5 text-xs rounded-lg border shadow-sm transition-colors cursor-default ${badgeColor}">
+                            ${shortName} <span class="ml-1.5 font-bold ${current === max ? 'text-emerald-600' : 'text-slate-400'}">${current}/${max}일</span>
+                         </span>`;
+            }
+            const dashboard = document.getElementById('allocation-dashboard');
+            if(dashboard) dashboard.innerHTML = html;
+        }
+
+        function updateSelectColor(selectElement) {
+            const val = selectElement.value;
+            selectElement?.classList?.remove('sel-course-1', 'sel-course-2', 'sel-manager-eu', 'sel-manager-pe', 'sel-manager-aws', 'sel-manager-nhn');
+            
+            if (val === '으뜸') selectElement?.classList?.add('sel-manager-eu');
+            else if (val === '페픽') selectElement?.classList?.add('sel-manager-pe');
+            else if (val === 'AWS') selectElement?.classList?.add('sel-manager-aws');
+            else if (val === 'NHN') selectElement?.classList?.add('sel-manager-nhn');
+            else if (val.includes('[1학기]')) selectElement?.classList?.add('sel-course-1');
+            else if (val.includes('[2학기]')) selectElement?.classList?.add('sel-course-2');
+        }
+
+        // DOM Loaded Init
+        document.addEventListener('DOMContentLoaded', () => {
+            const detailView = document.getElementById('view-detail');
+            if(detailView && detailView?.classList?.contains('active')) {
+                window.showTrack('common');
+            }
+
+            // 동적으로 테이블 행 생성 (1학기, 2학기)
+            const tbody1 = document.getElementById('tbody-sem1');
+            const tbody2 = document.getElementById('tbody-sem2');
+            if(tbody1) tbody1.innerHTML = generateTableRows(1, '2026-04-27');
+            if(tbody2) tbody2.innerHTML = generateTableRows(2, '2026-08-31'); // 2학기 시작일을 월요일로 고정
+
+            // Event Delegation을 통한 이벤트 처리 (동적으로 추가된 행까지 완벽 지원)
+            const scheduleContainer = document.getElementById('view-schedule');
+            
+            if(scheduleContainer) {
+                scheduleContainer.addEventListener('focusin', function(e) {
+                    if (e.target.classList.contains('course-select')) {
+                        e.target.prevValue = e.target.value || "";
+                    }
+                });
+
+                scheduleContainer.addEventListener('change', function(e) {
+                    if (e.target.classList.contains('course-select')) {
+                        const val = e.target.value;
+                        if (val) {
+                            const counts = getCounts();
+                            if (counts[val] > courseLimits[val]) {
+                                showWarningToast(val, courseLimits[val]);
+                                e.target.value = e.target.prevValue || ""; 
+                                updateSelectColor(e.target); 
+                                return; 
+                            }
+                        }
+                        e.target.prevValue = e.target.value;
+                        updateSelectColor(e.target);
+                        updateAllocationStatus();
+                    } else if (e.target.classList.contains('manager-select')) {
+                        updateSelectColor(e.target);
+                    } else if (e.target.classList.contains('date-input')) {
+                        window.updateRowStyle(e.target);
+                    }
+                });
+            }
+
+            // 초기 로딩 시 휴일/색상 스타일 세팅
+            document.querySelectorAll('.date-input').forEach(inp => window.updateRowStyle(inp));
+            
+            updateAllocationStatus();
+        });
+    </script>
+</body>
+</html>
