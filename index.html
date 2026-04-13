@@ -915,6 +915,8 @@
             '2026-05-01': '근로자의 날',
             '2026-05-05': '어린이날',
             '2026-05-25': '부처님오신날(대체)',
+            '2026-06-06': '현충일',
+            '2026-08-17': '광복절(대체)',
             '2026-09-23': '추석 연휴',
             '2026-09-24': '추석 연휴',
             '2026-09-25': '추석 연휴',
@@ -927,41 +929,55 @@
             let html = '';
             let [y, m, dayOfMonth] = startDateStr.split('-');
             let currDate = new Date(y, m - 1, dayOfMonth);
-            let rowIdx = 0;
-            
-            for (let w = 1; w <= 5; w++) {
-                for (let d = 1; d <= 5; d++) {
-                    // Skip weekends
-                    while(currDate.getDay() === 0 || currDate.getDay() === 6) {
-                        currDate.setDate(currDate.getDate() + 1);
-                    }
-                    
-                    const year = currDate.getFullYear();
-                    const month = String(currDate.getMonth() + 1).padStart(2, '0');
-                    const dateNum = String(currDate.getDate()).padStart(2, '0');
-                    const dateStr = `${year}-${month}-${dateNum}`;
 
-                    const dayIdx = currDate.getDay();
-                    const dayStr = ['일','월','화','수','목','금','토'][dayIdx];
-                    const holidayName = holidays2026[dateStr] || '';
-                    const isHoliday = !!holidayName;
-                    
-                    const courseOpts = semester === 1 
-                        ? `<option value="">과정 선택</option><option>[1학기] 프롬프트엔지니어링(15H)</option><option>[1학기] 클라우드입문(15H)</option><option>[1학기] ML/딥러닝 기초(15H)</option><option>[1학기] LLM 애플리케이션(30H)</option><option>[1학기] 제조설비 AI모델링(30H)</option><option>[1학기] AI Data 분석(15H)</option>`
-                        : `<option value="">과정 선택</option><option>[2학기] AI 디자인 씽킹(15H)</option><option>[2학기] NHN/AWS 멀티클라우드(15H)</option><option>[2학기] MLOps(15H)</option><option>[2학기] Cloud Native(15H)</option><option>[2학기] Digital Twin(30H)</option>`;
-                        
-                    const weekText = d === 1 ? `${w}주차` : '';
-                    const weekCell = `<td class="p-2 border-r ${isHoliday?'border-red-200':'border-slate-200'} font-bold ${isHoliday?'':'bg-slate-100 text-slate-800'} text-center week-cell align-middle">${weekText}</td>`;
-                    
-                    const trClass = isHoliday ? "bg-red-50 transition border-b border-red-200" : "hover:bg-slate-50 transition border-b border-slate-200";
-                    const tdClass = isHoliday ? "border-red-200" : "border-slate-200";
-                    const textClass = isHoliday ? "text-red-600 font-bold" : "text-slate-700";
-                    const bgClassC = isHoliday ? "" : (semester === 1 ? "bg-blue-50/20" : "bg-indigo-50/20");
-                    const bgClassM = isHoliday ? "" : (semester === 1 ? "bg-blue-50/40" : "bg-indigo-50/40");
+            // 1학기: 6월 말일(30일), 2학기: 10월 말일(31일)
+            const endDate = semester === 1
+                ? new Date(parseInt(y), 5, 30)   // 6월 30일
+                : new Date(parseInt(y), 9, 31);  // 10월 31일
 
-                    const methodOpts = `<option value="">-</option><option>온라인</option><option>오프라인</option>`;
+            let weekNum = 1;
+            let dayInWeek = 0;
 
-                    html += `
+            while (currDate <= endDate) {
+                // 주말 건너뜀
+                if (currDate.getDay() === 0 || currDate.getDay() === 6) {
+                    currDate.setDate(currDate.getDate() + 1);
+                    continue;
+                }
+
+                const year = currDate.getFullYear();
+                const month = String(currDate.getMonth() + 1).padStart(2, '0');
+                const dateNum = String(currDate.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${dateNum}`;
+
+                const dayIdx = currDate.getDay();
+                const dayStr = ['일','월','화','수','목','금','토'][dayIdx];
+                const holidayName = holidays2026[dateStr] || '';
+                const isHoliday = !!holidayName;
+
+                const courseOpts = semester === 1
+                    ? `<option value="">과정 선택</option><option>[1학기] 프롬프트엔지니어링(15H)</option><option>[1학기] 클라우드입문(15H)</option><option>[1학기] ML/딥러닝 기초(15H)</option><option>[1학기] LLM 애플리케이션(30H)</option><option>[1학기] 제조설비 AI모델링(30H)</option><option>[1학기] AI Data 분석(15H)</option>`
+                    : `<option value="">과정 선택</option><option>[2학기] AI 디자인 씽킹(15H)</option><option>[2학기] NHN/AWS 멀티클라우드(15H)</option><option>[2학기] MLOps(15H)</option><option>[2학기] Cloud Native(15H)</option><option>[2학기] Digital Twin(30H)</option>`;
+
+                // 월요일(1)이면 새 주차 시작
+                if (dayIdx === 1) {
+                    if (dayInWeek > 0) weekNum++;
+                    dayInWeek = 0;
+                }
+                dayInWeek++;
+
+                const weekText = dayInWeek === 1 ? `${weekNum}주차` : '';
+                const weekCell = `<td class="p-2 border-r ${isHoliday?'border-red-200':'border-slate-200'} font-bold ${isHoliday?'':'bg-slate-100 text-slate-800'} text-center week-cell align-middle">${weekText}</td>`;
+
+                const trClass = isHoliday ? "bg-red-50 transition border-b border-red-200" : "hover:bg-slate-50 transition border-b border-slate-200";
+                const tdClass = isHoliday ? "border-red-200" : "border-slate-200";
+                const textClass = isHoliday ? "text-red-600 font-bold" : "text-slate-700";
+                const bgClassC = isHoliday ? "" : (semester === 1 ? "bg-blue-50/20" : "bg-indigo-50/20");
+                const bgClassM = isHoliday ? "" : (semester === 1 ? "bg-blue-50/40" : "bg-indigo-50/40");
+
+                const methodOpts = `<option value="">-</option><option>온라인</option><option>오프라인</option>`;
+
+                html += `
                     <tr class="${trClass}">
                         ${weekCell}
                         <td class="p-1 border-r ${tdClass} align-middle">
@@ -992,10 +1008,8 @@
                             <input type="text" class="note-input w-full bg-transparent outline-none text-center ${isHoliday?'text-red-500 font-bold':'text-slate-500'}" value="${holidayName}" placeholder="비고">
                         </td>
                     </tr>`;
-                    
-                    currDate.setDate(currDate.getDate() + 1);
-                    rowIdx++;
-                }
+
+                currDate.setDate(currDate.getDate() + 1);
             }
             return html;
         };
