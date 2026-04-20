@@ -216,69 +216,147 @@
                             <thead>
                                 <tr class="bg-slate-200 text-slate-700 text-sm uppercase tracking-wider">
                                     <th class="p-4 font-semibold w-1/5">과정 구분</th>
-                                    <th class="p-4 font-semibold w-2/5">세부 교과목명</th>
+                                    <th class="p-4 font-semibold w-1/3">세부 교과목명</th>
                                     <th class="p-4 font-semibold text-center w-1/12">학기</th>
                                     <th class="p-4 font-semibold text-center w-1/12">시수(일수)</th>
-                                    <th class="p-4 font-semibold text-center w-1/4">핵심 활용 기술</th>
+                                    <th class="p-4 font-semibold text-center w-1/3">핵심 활용 기술</th>
                                 </tr>
                             </thead>
                             <tbody class="text-sm">
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
-                                    <td class="p-4 font-bold text-indigo-700 border-r border-slate-100">공통(초급)</td>
+                                    <td class="p-4 font-bold text-indigo-700 border-r border-slate-100" rowspan="2">공통(초급)</td>
                                     <td class="p-4 font-medium text-orange-600">프롬프트엔지니어링(몰입)</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">weeai</span>, ChatGPT</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold">weeai</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">ChatGPT</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+                                    <td class="p-4 font-medium text-orange-600">AI 디자인 씽킹(몰입)</td>
+                                    <td class="p-4 text-center">2</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold">weeai</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Miro</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-bold text-blue-700 border-r border-slate-100" rowspan="6">AI 데이터SW(컴공)</td>
                                     <td class="p-4 font-medium text-blue-700">클라우드입문 (몰입)</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">30 (10일)</td>
-                                    <td class="p-4 text-center"><span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">AWS</span></td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">AWS Cloud</span>
+                                            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">AWS Kiro</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-orange-600">ML/딥러닝 기초</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center">Teachable Machine</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Teachable Machine</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-blue-700">LLM 애플리케이션(몰입)</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">weeai</span>, Python</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-semibold">weeai</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">OpenAI API</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-blue-700">NHN/AWS 멀티 클라우드 운영(몰입)</td>
                                     <td class="p-4 text-center">2</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center"><span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs">AWS</span>, <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">NHN Cloud</span></td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">AWS Cloud</span>
+                                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">NHN Cloud</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-blue-700">MLOps(몰입)</td>
                                     <td class="p-4 text-center">2</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center">Hugging Face, Github</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Hugging Face</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Github</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-blue-700">Cloud Native 아키텍처(몰입)</td>
                                     <td class="p-4 text-center">2</td>
                                     <td class="p-4 text-center font-semibold">15 (5일)</td>
-                                    <td class="p-4 text-center">Docker, Linux, NHN Cloud</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Docker</span>
+                                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-semibold">NHN Cloud</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-bold text-emerald-700 border-r border-slate-100" rowspan="2">제조AI<br>(기계자동차)</td>
                                     <td class="p-4 font-medium text-blue-700">제조설비 AI모델링</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">30 (10일)</td>
-                                    <td class="p-4 text-center">Google Colab, Python</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Colab Pro</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Python</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                                 <tr class="border-b border-slate-300 hover:bg-slate-50 transition">
                                     <td class="p-4 font-medium text-blue-700">Digital Twin 기반 공정 시뮬레이션</td>
                                     <td class="p-4 text-center">2</td>
                                     <td class="p-4 text-center font-semibold">30 (10일)</td>
-                                    <td class="p-4 text-center">Python, SimPy</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Python/SimPy</span>
+                                            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-semibold">AWS Cloud</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-4 font-bold text-rose-700 border-r border-slate-100">AIAD(건축)</td>
+                                    <td class="p-4 font-medium text-red-600">AI Data 분석 및 시각화</td>
+                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center font-semibold">15 (5일)</td>
+                                    <td class="p-3 text-center">
+                                        <div class="flex flex-wrap gap-1 justify-center">
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Python/Folium</span>
+                                            <span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-semibold">Tableau</span>
+                                            <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-xs font-semibold border border-indigo-100">Slack</span>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                             <tfoot>
