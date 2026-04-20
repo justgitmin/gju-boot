@@ -1301,7 +1301,7 @@
 
             const tbody1 = document.getElementById('tbody-sem1');
             const tbody2 = document.getElementById('tbody-sem2');
-            if(tbody1) tbody1.innerHTML = window.generateTableRows(1, '2026-04-27');
+            if(tbody1) tbody1.innerHTML = window.generateTableRows(1, '2026-05-06');
             if(tbody2) tbody2.innerHTML = window.generateTableRows(2, '2026-08-31');
 
             // 초기 잠금 상태 적용
@@ -1414,6 +1414,19 @@
             '[2학기] AI 디자인 씽킹(15H)':        '',   // 과정 삭제 → 빈값
         };
 
+        // 1학기 시작일 변경 마이그레이션: 4/27~5/5 평일 → 5/6 이후 날짜로 순서 매핑
+        const sem1DateMigration = {
+            '2026-04-27': '2026-05-06',
+            '2026-04-28': '2026-05-07',
+            '2026-04-29': '2026-05-08',
+            '2026-04-30': '2026-05-09',
+            // 5/1 근로자의날(공휴일), 5/5 어린이날(공휴일) 제외
+        };
+
+        function migrateSem1Date(dateVal) {
+            return sem1DateMigration[dateVal] || dateVal;
+        }
+
         function migrateCourseValue(val) {
             return (val in courseValueMigration) ? courseValueMigration[val] : val;
         }
@@ -1441,8 +1454,14 @@
                 const needed = {}; // dateVal → maxRowIdx
                 keys.forEach(k => {
                     const parts = k.split('__');
-                    const dateVal = parts[1];
+                    let dateVal = parts[1];
                     const rowIdx  = parseInt(parts[2]);
+                    
+                    // 1학기 날짜 마이그레이션 적용
+                    if (tbodyId === 'tbody-sem1') {
+                        dateVal = migrateSem1Date(dateVal);
+                    }
+                    
                     if (needed[dateVal] === undefined || rowIdx > needed[dateVal]) {
                         needed[dateVal] = rowIdx;
                     }
@@ -1469,9 +1488,14 @@
                 // 값 채우기
                 keys.forEach(k => {
                     const parts = k.split('__');
-                    const dateVal = parts[1];
+                    let dateVal = parts[1];
                     const rowIdx  = parseInt(parts[2]);
                     let [course, manager, method, note] = (data[k] || '').split('||');
+
+                    // 1학기 날짜 마이그레이션 적용
+                    if (tbodyId === 'tbody-sem1') {
+                        dateVal = migrateSem1Date(dateVal);
+                    }
 
                     // 구버전 과정명 마이그레이션
                     course = migrateCourseValue(course || '');
