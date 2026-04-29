@@ -162,6 +162,26 @@
         <span id="toast-text" class="whitespace-pre-line text-center">메시지</span>
     </div>
 
+    <!-- Poster Modal -->
+    <div id="poster-modal" class="fixed inset-0 z-[300] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] flex flex-col">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2"><i class="fas fa-file-image text-rose-500"></i> 과정 포스터 미리보기</h3>
+                <div class="flex gap-2">
+                    <button onclick="window.downloadPoster()" class="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg font-bold text-sm hover:bg-rose-700 transition">
+                        <i class="fas fa-file-pdf"></i> PDF 저장
+                    </button>
+                    <button onclick="window.closePosterModal()" class="px-3 py-2 bg-slate-100 text-slate-600 rounded-lg font-bold text-sm hover:bg-slate-200 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-y-auto flex-1 p-4 bg-slate-100">
+                <div id="poster-content" class="mx-auto"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Reset Confirm Modal -->
     <div id="reset-modal" class="fixed inset-0 z-[200] bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300" id="reset-modal-content">
@@ -183,7 +203,6 @@
         <div class="flex space-x-2 overflow-x-auto">
             <button class="nav-btn active whitespace-nowrap" onclick="switchView('home')" id="nav-home">홈</button>
             <button class="nav-btn whitespace-nowrap" onclick="switchView('schedule')" id="nav-schedule">강의 일정표</button>
-            <button class="nav-btn whitespace-nowrap" onclick="switchView('daily')" id="nav-daily">일차별 커리큘럼</button>
             <button class="nav-btn whitespace-nowrap" onclick="switchView('detail')" id="nav-detail">상세 일차별 설계</button>
         </div>
     </nav>
@@ -372,7 +391,7 @@
                                 </tr>
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-bold text-emerald-700 border-r border-slate-100" rowspan="2">제조AI<br>(기계자동차)</td>
-                                    <td class="p-4 font-medium text-blue-700">제조설비 AI모델링(중급)</td>
+                                    <td class="p-4 font-medium text-blue-700">제조설비 AI모델링(고급기계)</td>
                                     <td class="p-4 text-center">1</td>
                                     <td class="p-4 text-center font-semibold">30 (8일)</td>
                                     <td class="p-3 text-center">
@@ -502,137 +521,26 @@
         </div>
 
         <!-- ==========================================
-             VIEW 2: 일차별 커리큘럼 (Daily Breakdown Overview)
-             ========================================== -->
-        <div id="view-daily" class="view-section">
-            <div class="bg-white shadow-xl rounded-2xl p-10">
-                <h2 class="text-3xl font-extrabold text-slate-800 mb-8 border-b-2 border-slate-100 pb-4">상세 커리큘럼 명세서 <span class="text-lg font-normal text-slate-500 ml-2">(요약 목록)</span></h2>
-                
-                <!-- Track 1 -->
-                <div class="mb-10">
-                    <h3 class="text-xl font-extrabold text-indigo-800 mb-4 flex items-center bg-indigo-50 p-3 rounded-lg"><i class="fas fa-layer-group mr-3"></i> 공통(초급)</h3>
-                    <div class="space-y-4 pl-4 border-l-2 border-indigo-100 ml-2">
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex justify-between">1. [1학기] 프롬프트엔지니어링 A반(초급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600">15H (5일) / 오프라인15</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~2일차(오프)</span> <div>오리엔테이션, LLM 원리 이해, 좋은 프롬프트 3요소 및 비교 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3일차(오프)</span> <div>역할/맥락 부여, 형식 지정 및 CoT(단계별 사고) 프롬프팅 학습</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">4~5일차(오프)</span> <div>상황별 실전 프롬프트 적용 및 나만의 프롬프트 북 제작/발표</div></li>
-                            </ul>
-                        </div>
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex justify-between">2. [1학기] 프롬프트엔지니어링 B반(초급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600">15H (5일) / 오프라인15</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~2일차(오프)</span> <div>오리엔테이션, LLM 원리 이해, 좋은 프롬프트 3요소 및 비교 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3일차(오프)</span> <div>역할/맥락 부여, 형식 지정 및 CoT(단계별 사고) 프롬프팅 학습</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">4~5일차(오프)</span> <div>상황별 실전 프롬프트 적용 및 나만의 프롬프트 북 제작/발표</div></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Track 2 -->
-                <div class="mb-10">
-                    <h3 class="text-xl font-extrabold text-blue-800 mb-4 flex items-center bg-blue-50 p-3 rounded-lg"><i class="fas fa-network-wired mr-3"></i> AI 데이터SW(컴공)</h3>
-                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 pl-4 border-l-2 border-blue-100 ml-2">
-                        
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">1. [1학기] 클라우드입문 (공통중급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">30H (8일) / 온4:오프28</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, AWS 계정 생성 및 첫 가상머신(EC2) 생성 맛보기</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>클라우드 필수 개념(IaaS/PaaS) 및 기본 아키텍처 이해</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>EC2 접속, IAM 보안, S3 호스팅 및 VPC 네트워크 실습</div></li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">2. [1학기] ML/딥러닝 기초(중급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, 티처블머신 환경 세팅 및 객체 분류 모델 기초 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>지도/비지도 학습 개념, 분류/회귀 이해, 전처리 및 평가 방법론</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>오렌지 데이터 마이닝 설치, 데이터 정제 및 코딩 없는 모델 시각화</div></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">3. [1학기] LLM 애플리케이션(고급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, 파이썬 환경(Colab) 구성, API Key 발급 및 테스트</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>파이썬 기초(변수/조건문/함수), 외부 라이브러리 및 JSON 개념 학습</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~10일차(오프)</span> <div>weeai 연동 터미널 챗봇, RAG 파이프라인 구축 및 Streamlit 웹 배포</div></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">4. [2학기] NHN/AWS 멀티 클라우드 운영(중급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, NHN Cloud 콘솔 접속 및 네트워크(VPC) 맛보기 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>K-클라우드 동향, NHN-AWS 용어 비교 및 아키텍처 보안 이론</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>NHN Cloud 실 인프라 구성, 로드밸런서 구축 및 멀티 클라우드 장애대응</div></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">5. [2학기] MLOps(고급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, Git/Github 기초 세팅, 계정 연동 및 파이썬 소스 Push 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>DevOps/MLOps 차이점 및 AI 모델 배포(Serving) 파이프라인 이론</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>Hugging Face 모델 탐색, Gradio UI 연동 및 Spaces 웹 서비스 실 배포</div></li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                            <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">6. [2학기] Cloud Native 아키텍처(고급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">15H (5일) / 온3:오프12</span></h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, Docker Desktop 세팅 및 Nginx 컨테이너 띄우기 실습</div></li>
-                                <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>모놀리식 vs MSA, 컨테이너 개념, Docker 생명주기 및 네트워크 이해</div></li>
-                                <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~5일차(오프)</span> <div>Docker 명령어 실습, 컨테이너 패키징 및 NHN Cloud 환경 실 배포</div></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Track 3 & 4 -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Track 3 -->
-                    <div>
-                        <h3 class="text-xl font-extrabold text-emerald-800 mb-4 flex items-center bg-emerald-50 p-3 rounded-lg"><i class="fas fa-industry mr-3"></i> 제조AI(기계자동차)</h3>
-                        <div class="space-y-4 pl-4 border-l-2 border-emerald-100 ml-2">
-                            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">1. [1학기] 제조설비 AI모델링(중급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">30H (8일) / 온4:오프28</span></h4>
-                                <ul class="text-sm text-slate-600 space-y-2">
-                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1~3일차(오프)</span> <div>제조 현장 이해, 센서 데이터 파악 및 파이썬 데이터 읽기 기초</div></li>
-                                    <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">4일차(온)</span> <div>센서 데이터 그래프 시각화 및 해석 분석에 집중</div></li>
-                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">5~10일차(오프)</span> <div>결측치 전처리, 이상 탐지 모델 학습/평가 및 결과물 발표</div></li>
-                                </ul>
-                            </div>
-                            <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm hover:shadow-md transition">
-                                <h4 class="font-bold text-lg text-slate-800 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">2. [2학기] Digital Twin 기반 공정 시뮬레이션(고급) <span class="text-sm font-normal bg-slate-100 px-2 py-1 rounded text-slate-600 shrink-0">30H (8일) / 온4:오프28</span></h4>
-                                <ul class="text-sm text-slate-600 space-y-2">
-                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">1일차(오프)</span> <div>오리엔테이션, DT 개념, 아날로그 공정 체험 및 보드게임 실습</div></li>
-                                    <li class="flex items-start"><span class="day-badge-on mr-3 mt-0.5">2일차(온)</span> <div>단순 공정 시뮬레이션 파이썬 코드 실행 및 결과 로그 시각적 해석</div></li>
-                                    <li class="flex items-start"><span class="day-badge-off mr-3 mt-0.5">3~10일차(오프)</span> <div>병목 현상 분석, 파라미터 최적화 실험, 결과 시각화 및 프로젝트 발표</div></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==========================================
              VIEW 3: 상세 일차별 설계 (Detailed Daily Table)
              ========================================== -->
         <div id="view-detail" class="view-section">
             <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 min-h-[600px]">
                 <div class="flex items-center justify-between mb-2 flex-wrap gap-3">
                     <h2 class="text-3xl font-extrabold text-slate-800">상세 일차별 설계</h2>
-                    <button onclick="window.printDetailCourse()"
-                        id="detail-pdf-btn"
-                        class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-rose-600 text-white border-rose-500 hover:bg-rose-700 no-print hidden">
-                        <i class="fas fa-file-pdf"></i>
-                        <span>현재 과정 PDF 저장</span>
-                    </button>
+                    <div class="flex items-center gap-2 no-print">
+                        <button onclick="window.printDetailCourse()"
+                            id="detail-pdf-btn"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-rose-600 text-white border-rose-500 hover:bg-rose-700 hidden">
+                            <i class="fas fa-file-pdf"></i>
+                            <span>현재 과정 PDF 저장</span>
+                        </button>
+                        <button onclick="window.openPosterModal()"
+                            id="detail-poster-btn"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700 hidden">
+                            <i class="fas fa-file-image"></i>
+                            <span>포스터 보기</span>
+                        </button>
+                    </div>
                 </div>
                 <p class="mb-6 text-slate-600 text-sm md:text-base no-print">아래 대분류(트랙)를 선택한 후, 나타나는 상세 교과목을 클릭하여 1일 3시간 시간표를 확인하세요.</p>
                 
@@ -863,7 +771,7 @@
                 color: 'emerald',
                 courses: [
                     {
-                        name: '[1학기] 제조설비 AI모델링(중급) [30H/8일]',
+                        name: '[1학기] 제조설비 AI모델링(고급기계) [30H/8일]',
                         goal: '제조 현장의 AI 활용 사례를 이해하고, 센서 데이터를 시각화하며 이상 탐지 및 불량 예측 모델을 직접 실행·해석하여 실제 현장 적용 방안을 제안할 수 있습니다.',
                         days: [
                             { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 데이터 기반 문제 해결 프로세스 안내', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '제조 AI 핵심 개념과 실제 산업 적용 사례 시청', method: '사례연구 (오프라인)' }, { time: '3교시 (1H)', content: '"왜 AI인가?" 비전공자 눈높이에 맞춘 제조 현장의 문제 해결 경험 토의', method: '토의/실습 (오프라인)' } ] },
@@ -897,6 +805,7 @@
                 ]
             }
         };
+        window.curriculumData = curriculumData; // 전역 접근 등록
 
         const courseLimits = {
             '[1학기] 프롬프트엔지니어링 A반(15H)': 5,
@@ -1012,13 +921,14 @@
             `;
             
             course.days.forEach(day => {
-                const isOnline = day.day.includes('온라인');
-                const badgeClass = isOnline ? `${theme.lightBg} ${theme.lightText} ${theme.lightBorder}` : 'bg-slate-700 text-white border-slate-800';
+                // 모든 과정 오프라인으로 표시
+                const displayDay = day.day.replace('(온라인)', '(오프라인 실습)');
+                const badgeClass = 'bg-slate-700 text-white border-slate-800';
                 
                 html += `
                     <div>
                         <div class="flex items-center mb-3">
-                            <h5 class="font-bold text-base px-3 py-1.5 rounded border ${badgeClass} shadow-sm">${day.day}</h5>
+                            <h5 class="font-bold text-base px-3 py-1.5 rounded border ${badgeClass} shadow-sm">${displayDay}</h5>
                             <div class="flex-1 border-b border-slate-200 ml-4"></div>
                         </div>
                         <div class="overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
@@ -1034,12 +944,13 @@
                 `;
                 
                 day.lessons.forEach(lesson => {
+                    const displayMethod = lesson.method.replace('(온라인)', '(오프라인)');
                     html += `
                                     <tr class="hover:bg-slate-50 transition-colors">
                                         <td class="p-3.5 ${theme.text} font-semibold bg-slate-50/50">${lesson.time}</td>
                                         <td class="p-3.5 text-slate-800 font-medium leading-relaxed">${lesson.content}</td>
                                         <td class="p-3.5 text-center text-slate-600 text-xs font-semibold">
-                                            <span class="bg-white border border-slate-200 px-2.5 py-1 rounded shadow-sm inline-block">${lesson.method}</span>
+                                            <span class="bg-white border border-slate-200 px-2.5 py-1 rounded shadow-sm inline-block">${displayMethod}</span>
                                         </td>
                                     </tr>
                     `;
@@ -1062,12 +973,18 @@
 
             container.innerHTML = html;
 
-            // PDF 버튼 표시 및 과정명 업데이트
+            // PDF/포스터 버튼 표시 및 과정명 업데이트
             const pdfBtn = document.getElementById('detail-pdf-btn');
+            const posterBtn = document.getElementById('detail-poster-btn');
             if (pdfBtn) {
                 pdfBtn.classList.remove('hidden');
                 const courseName = course.name.split(' [')[0];
                 pdfBtn.querySelector('span').textContent = `📄 ${courseName} PDF 저장`;
+            }
+            if (posterBtn) {
+                posterBtn.classList.remove('hidden');
+                posterBtn._trackKey = trackKey;
+                posterBtn._courseIndex = courseIndex;
             }
         };
 
@@ -1432,6 +1349,544 @@
             document.body.classList.add('print-detail');
             window.print();
             document.body.classList.remove('print-detail');
+        };
+
+        // === Poster Generator ===
+
+        // 과정별 포스터 메타데이터
+        const posterMeta = {
+            '[1학기] 프롬프트엔지니어링 A반(초급) [15H]': {
+                classLabel: 'A반',
+                classDays: ['화요일', '목요일'],
+                badgeText: '1학기 공통과정 · 공통초급',
+                color: '#2563EB',
+                colorLight: '#EFF6FF',
+                heroTitle: '프롬프트',
+                heroTitleSub: '엔지니어링',
+                heroDesc: 'AI와 대화하는 방법을 배우는 것을 넘어,\nAI를 내 업무의 강력한 파트너로 만드는 기술.\n코딩 없이도 ChatGPT·weeai를 자유자재로 다루는\n나만의 프롬프트 북을 완성합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: '화·목', label: '수업 요일' },
+                    { num: '3주', label: '과정 기간' }
+                ],
+                scheduleText: 'A반 수업 일정',
+                scheduleDesc: '매주 화요일 · 목요일 | 전일 오프라인 진행',
+                tools: [
+                    { icon: '🤖', bg: '#F3E8FF', name: 'weeai', desc: '코딩 없이 다양한 LLM을 한 곳에서 테스트·비교할 수 있는 AI 에이전트 통합 플랫폼' },
+                    { icon: '💬', bg: '#F0FDF4', name: 'ChatGPT', desc: '실무에서 가장 많이 쓰이는 OpenAI LLM으로 직접 프롬프트를 실험합니다' },
+                    { icon: '📲', bg: '#EEF2FF', name: 'Slack', desc: '강의 자료·Q&A·실습 결과물을 팀과 공유하는 협업 채널' }
+                ],
+                outcomes: [
+                    { title: 'AI 업무 자동화', desc: '보고서 작성, 이메일 초안, 데이터 정리를 AI로 자동화합니다' },
+                    { title: '정밀한 출력 제어', desc: '원하는 포맷·톤·길이로 AI 답변을 정확히 통제합니다' },
+                    { title: 'CoT 고급 기법 적용', desc: '복잡한 문제를 단계별로 분해해 AI가 더 정확히 사고하게 유도합니다' },
+                    { title: '나만의 프롬프트 북', desc: '업무·전공 분야에 특화된 고품질 프롬프트 모음집을 직접 제작합니다' }
+                ],
+                targets: ['🎓 전공 무관 — 모든 학과 학생', '🔰 코딩 경험이 전혀 없어도 OK', '📅 화·목요일 일정이 맞는 분', '💼 AI로 업무 생산성 높이고 싶은 분'],
+                ctaTitle: 'A반 지금 바로 신청하세요',
+                ctaDesc: '수업 요일: 매주 화요일 · 목요일 (전일 오프라인)\n모든 트랙 수강생 공통 필수 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: 'A반 신청 →'
+            },
+            '[1학기] 프롬프트엔지니어링 B반(초급) [15H]': {
+                classLabel: 'B반',
+                classDays: ['월요일', '수요일'],
+                badgeText: '1학기 공통과정 · 공통초급',
+                color: '#7C3AED',
+                colorLight: '#F5F3FF',
+                heroTitle: '프롬프트',
+                heroTitleSub: '엔지니어링',
+                heroDesc: 'AI와 대화하는 방법을 배우는 것을 넘어,\nAI를 내 업무의 강력한 파트너로 만드는 기술.\n코딩 없이도 ChatGPT·weeai를 자유자재로 다루는\n나만의 프롬프트 북을 완성합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: '월·수', label: '수업 요일' },
+                    { num: '3주', label: '과정 기간' }
+                ],
+                scheduleText: 'B반 수업 일정',
+                scheduleDesc: '매주 월요일 · 수요일 | 전일 오프라인 진행',
+                tools: [
+                    { icon: '🤖', bg: '#F3E8FF', name: 'weeai', desc: '코딩 없이 다양한 LLM을 한 곳에서 테스트·비교할 수 있는 AI 에이전트 통합 플랫폼' },
+                    { icon: '💬', bg: '#F0FDF4', name: 'ChatGPT', desc: '실무에서 가장 많이 쓰이는 OpenAI LLM으로 직접 프롬프트를 실험합니다' },
+                    { icon: '📲', bg: '#EEF2FF', name: 'Slack', desc: '강의 자료·Q&A·실습 결과물을 팀과 공유하는 협업 채널' }
+                ],
+                outcomes: [
+                    { title: 'AI 업무 자동화', desc: '보고서 작성, 이메일 초안, 데이터 정리를 AI로 자동화합니다' },
+                    { title: '정밀한 출력 제어', desc: '원하는 포맷·톤·길이로 AI 답변을 정확히 통제합니다' },
+                    { title: 'CoT 고급 기법 적용', desc: '복잡한 문제를 단계별로 분해해 AI가 더 정확히 사고하게 유도합니다' },
+                    { title: '나만의 프롬프트 북', desc: '업무·전공 분야에 특화된 고품질 프롬프트 모음집을 직접 제작합니다' }
+                ],
+                targets: ['🎓 전공 무관 — 모든 학과 학생', '🔰 코딩 경험이 전혀 없어도 OK', '📅 월·수요일 일정이 맞는 분', '💼 AI로 업무 생산성 높이고 싶은 분'],
+                ctaTitle: 'B반 지금 바로 신청하세요',
+                ctaDesc: '수업 요일: 매주 월요일 · 수요일 (전일 오프라인)\n모든 트랙 수강생 공통 필수 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: 'B반 신청 →'
+            },
+            '[1학기] 클라우드입문 (중급) [30H/8일]': {
+                classLabel: '공통중급',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '1학기 공통과정 · 공통중급',
+                color: '#EA580C',
+                colorLight: '#FFF7ED',
+                heroTitle: '클라우드',
+                heroTitleSub: '입문',
+                heroDesc: '복잡한 서버 없이 AWS 클라우드로\n나만의 인프라를 직접 구축하는 경험.\nEC2·S3·VPC 핵심 서비스를 손으로 익히며\n클라우드 엔지니어의 첫 걸음을 내딛습니다.',
+                stats: [
+                    { num: '30H', label: '총 교육 시수' },
+                    { num: '8일', label: '집중 실습' },
+                    { num: 'AWS', label: '핵심 플랫폼' },
+                    { num: '4H', label: '1일 수업 시간' }
+                ],
+                scheduleText: '클라우드입문 수업 일정',
+                scheduleDesc: '8일 집중 과정 | 오프라인 실습 중심',
+                tools: [
+                    { icon: '☁️', bg: '#FFF7ED', name: 'AWS Cloud', desc: 'EC2·S3·VPC·IAM 등 글로벌 표준 클라우드 서비스를 직접 실습합니다' },
+                    { icon: '🤖', bg: '#FEF3C7', name: 'AWS Kiro', desc: 'AI 기반 클라우드 개발 도구로 인프라 구성을 더 빠르게 학습합니다' },
+                    { icon: '🐧', bg: '#F0FDF4', name: 'Linux', desc: 'EC2 서버 접속 및 기본 명령어 실습으로 서버 운영 기초를 다집니다' }
+                ],
+                outcomes: [
+                    { title: 'EC2 서버 구축', desc: '가상머신 생성부터 SSH 접속, 웹 서버 구동까지 직접 완성합니다' },
+                    { title: 'S3 웹 호스팅', desc: '정적 웹사이트를 S3에 업로드하고 인터넷에 퍼블리싱합니다' },
+                    { title: 'VPC 네트워크 설계', desc: '서브넷·보안그룹·게이트웨이로 나만의 가상 네트워크를 구성합니다' },
+                    { title: '고가용성 아키텍처', desc: 'Auto Scaling·Load Balancer로 트래픽에 자동 대응하는 인프라를 만듭니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '☁️ 클라우드 인프라에 관심 있는 분', '🔧 직접 서버를 만들어보고 싶은 분', '📈 AWS 자격증을 목표로 하는 분'],
+                ctaTitle: '클라우드입문 과정 신청하세요',
+                ctaDesc: '1학기 공통중급 과정 | 8일 집중 오프라인 실습\nAI 데이터SW 트랙 필수 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[1학기] ML/딥러닝 기초(중급) [15H]': {
+                classLabel: '공통중급',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '1학기 공통과정 · 공통중급',
+                color: '#16A34A',
+                colorLight: '#F0FDF4',
+                heroTitle: 'ML/딥러닝',
+                heroTitleSub: '기초',
+                heroDesc: '수식 없이 직관적인 도구로\n머신러닝·딥러닝의 원리를 직접 체험합니다.\n티처블머신으로 AI 모델을 만들고\n오렌지로 데이터를 분석하는 실전 과정입니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: '노코드', label: '실습 방식' },
+                    { num: '3주', label: '과정 기간' }
+                ],
+                scheduleText: 'ML/딥러닝 기초 수업 일정',
+                scheduleDesc: '5일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🎓', bg: '#F0FDF4', name: 'Teachable Machine', desc: '구글의 노코드 AI 도구로 웹캠만으로 이미지 분류 모델을 직접 학습시킵니다' },
+                    { icon: '🍊', bg: '#FFF7ED', name: 'Orange 3', desc: '코딩 없이 드래그&드롭으로 데이터 분석·시각화·모델링을 수행하는 툴입니다' },
+                    { icon: '🤖', bg: '#FEF3C7', name: 'AWS Kiro', desc: 'AI 기반 개발 도구로 실습 과정을 더 효율적으로 진행합니다' }
+                ],
+                outcomes: [
+                    { title: 'AI 모델 직접 학습', desc: '티처블머신으로 이미지 분류 모델을 만들고 실시간으로 테스트합니다' },
+                    { title: '데이터 분석 기초', desc: 'CSV 데이터를 불러와 분포·상관관계를 시각화하고 해석합니다' },
+                    { title: '의사결정나무 모델링', desc: '오렌지로 분류 모델을 만들고 정확도를 평가합니다' },
+                    { title: 'ML 핵심 개념 이해', desc: '지도/비지도 학습, 과적합, 평가 지표 등 핵심 개념을 체험으로 익힙니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '🔰 코딩 없이 AI를 배우고 싶은 분', '📊 데이터 분석에 관심 있는 분', '🤖 머신러닝 원리가 궁금한 분'],
+                ctaTitle: 'ML/딥러닝 기초 과정 신청하세요',
+                ctaDesc: '1학기 공통중급 과정 | 5일 오프라인 집중 실습\n모든 트랙 수강생 공통 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[1학기] LLM 애플리케이션(고급) [15H]': {
+                classLabel: '고급컴공',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '1학기 고급과정 · 고급컴공',
+                color: '#7C3AED',
+                colorLight: '#F5F3FF',
+                heroTitle: 'LLM',
+                heroTitleSub: '애플리케이션',
+                heroDesc: '파이썬 기초부터 AI API 연동까지,\n나만의 챗봇을 직접 만들고 웹에 배포합니다.\nweeai와 OpenAI API로 RAG 파이프라인을 구축하고\nStreamlit으로 실제 서비스를 완성합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: 'Python', label: '핵심 언어' },
+                    { num: 'RAG', label: '핵심 기술' }
+                ],
+                scheduleText: 'LLM 애플리케이션 수업 일정',
+                scheduleDesc: '5일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🤖', bg: '#F3E8FF', name: 'weeai', desc: 'AI 에이전트 통합 플랫폼으로 RAG 파이프라인을 직관적으로 구축합니다' },
+                    { icon: '🐍', bg: '#EEF2FF', name: 'Python / Colab', desc: '파이썬 기초 문법부터 API 연동까지 구글 코랩 환경에서 실습합니다' },
+                    { icon: '🌐', bg: '#FDF4FF', name: 'Streamlit', desc: '파이썬만으로 AI 챗봇 웹 서비스를 만들고 클라우드에 배포합니다' }
+                ],
+                outcomes: [
+                    { title: '파이썬 기초 완성', desc: '변수·조건문·함수·리스트 등 AI 개발에 필요한 파이썬 핵심 문법을 익힙니다' },
+                    { title: 'AI API 연동', desc: 'OpenAI/weeai API를 호출하여 질문·답변이 가능한 터미널 챗봇을 완성합니다' },
+                    { title: 'RAG 파이프라인 구축', desc: '내 문서를 기반으로 답변하는 할루시네이션 방지 AI 챗봇을 만듭니다' },
+                    { title: '웹 서비스 배포', desc: 'Streamlit으로 AI 챗봇을 웹 앱으로 전환하고 퍼블릭 URL로 배포합니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '🐍 파이썬을 처음 배우는 분', '🤖 나만의 AI 챗봇을 만들고 싶은 분', '🚀 AI 서비스 개발에 도전하고 싶은 분'],
+                ctaTitle: 'LLM 애플리케이션 과정 신청하세요',
+                ctaDesc: '1학기 고급컴공 과정 | 5일 오프라인 집중 실습\nAI 데이터SW 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[2학기] NHN/AWS 멀티 클라우드 운영(중급) [15H]': {
+                classLabel: '고급컴공',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '2학기 고급과정 · 고급컴공',
+                color: '#0369A1',
+                colorLight: '#F0F9FF',
+                heroTitle: 'NHN/AWS',
+                heroTitleSub: '멀티클라우드',
+                heroDesc: '국내 1위 NHN Cloud와 글로벌 표준 AWS를\n동시에 다루는 멀티 클라우드 실전 과정.\n실제 인프라를 구성하고 로드밸런서를 구축하며\n클라우드 운영 전문가로 성장합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: '멀티', label: '클라우드 환경' },
+                    { num: '실무', label: '아키텍처 설계' }
+                ],
+                scheduleText: 'NHN/AWS 멀티클라우드 수업 일정',
+                scheduleDesc: '5일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🔵', bg: '#DBEAFE', name: 'NHN Cloud', desc: '국내 공공·금융 인프라를 주도하는 K-클라우드로 VPC·인스턴스·로드밸런서를 실습합니다' },
+                    { icon: '☁️', bg: '#FFF7ED', name: 'AWS Cloud', desc: '글로벌 표준 클라우드와 NHN Cloud를 비교하며 멀티 클라우드 아키텍처를 설계합니다' },
+                    { icon: '📲', bg: '#EEF2FF', name: 'Slack', desc: '강의 자료·Q&A·실습 결과물을 팀과 공유하는 협업 채널' }
+                ],
+                outcomes: [
+                    { title: 'NHN Cloud 인프라 구성', desc: 'VPC·서브넷·보안그룹·인스턴스를 직접 생성하고 웹 서버를 구동합니다' },
+                    { title: '로드밸런서 구축', desc: '다중 인스턴스에 트래픽을 분산하는 로드밸런서를 실제로 구성합니다' },
+                    { title: '멀티 클라우드 설계', desc: 'AWS-NHN 연계 아키텍처를 설계하고 장애 대응 시나리오를 실습합니다' },
+                    { title: 'K-클라우드 전문성', desc: '공공·금융 망 분리 요건을 이해하고 국내 클라우드 도입 전략을 파악합니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '☁️ 클라우드 운영에 관심 있는 분', '🏢 국내 클라우드 취업을 목표로 하는 분', '🔧 실제 인프라를 구성해보고 싶은 분'],
+                ctaTitle: 'NHN/AWS 멀티클라우드 과정 신청하세요',
+                ctaDesc: '2학기 고급컴공 과정 | 5일 오프라인 집중 실습\nAI 데이터SW 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[2학기] MLOps(고급) [15H]': {
+                classLabel: '고급컴공',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '2학기 고급과정 · 고급컴공',
+                color: '#0284C7',
+                colorLight: '#F0F9FF',
+                heroTitle: 'MLOps',
+                heroTitleSub: '모델 배포',
+                heroDesc: '완성된 AI 모델을 실제 서비스로 배포하고\n운영하는 전체 생애주기를 직접 경험합니다.\nHugging Face·Gradio·Github으로\n나만의 AI 서비스를 세상에 공개합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: 'HF', label: 'Hugging Face' },
+                    { num: '배포', label: '실전 서비스' }
+                ],
+                scheduleText: 'MLOps 수업 일정',
+                scheduleDesc: '5일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🤗', bg: '#FEF3C7', name: 'Hugging Face', desc: '수천 개의 오픈소스 AI 모델을 탐색하고 다운로드하여 로컬에서 실행합니다' },
+                    { icon: '🎨', bg: '#FDF4FF', name: 'Gradio', desc: 'AI 모델에 웹 UI를 붙여 누구나 사용할 수 있는 데모 앱을 만듭니다' },
+                    { icon: '🐙', bg: '#F1F5F9', name: 'Github', desc: 'Git으로 코드를 버전 관리하고 Hugging Face Spaces에 배포합니다' }
+                ],
+                outcomes: [
+                    { title: 'Git/Github 마스터', desc: '버전 관리 시스템을 익히고 코드를 원격 저장소에 Push합니다' },
+                    { title: 'AI 모델 로컬 실행', desc: 'Hugging Face에서 모델을 다운로드하고 Transformers로 추론을 실행합니다' },
+                    { title: 'Gradio UI 개발', desc: 'AI 모델에 입출력 인터페이스를 붙여 웹 데모 앱을 완성합니다' },
+                    { title: '퍼블릭 AI 서비스 배포', desc: 'Hugging Face Spaces에 배포하여 누구나 접속 가능한 AI 서비스를 공개합니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '🤖 AI 모델을 서비스로 만들고 싶은 분', '🐙 Github 사용법을 익히고 싶은 분', '🚀 AI 포트폴리오를 만들고 싶은 분'],
+                ctaTitle: 'MLOps 과정 신청하세요',
+                ctaDesc: '2학기 고급컴공 과정 | 5일 오프라인 집중 실습\nAI 데이터SW 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[2학기] Cloud Native 아키텍처(고급) [15H]': {
+                classLabel: '고급컴공',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '2학기 고급과정 · 고급컴공',
+                color: '#0F766E',
+                colorLight: '#F0FDFA',
+                heroTitle: 'Cloud Native',
+                heroTitleSub: '아키텍처',
+                heroDesc: '현대 앱의 핵심 기술, 컨테이너를 직접 다룹니다.\nDocker로 앱을 패키징하고\nNHN Cloud 환경에 실제 배포하며\n클라우드 네이티브 개발자로 성장합니다.',
+                stats: [
+                    { num: '15H', label: '총 교육 시수' },
+                    { num: '5일', label: '오프라인 집중 수업' },
+                    { num: 'Docker', label: '핵심 기술' },
+                    { num: '배포', label: '실전 클라우드' }
+                ],
+                scheduleText: 'Cloud Native 아키텍처 수업 일정',
+                scheduleDesc: '5일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🐳', bg: '#DBEAFE', name: 'Docker', desc: '컨테이너 생성·실행·패키징의 전 과정을 Docker Desktop으로 직접 실습합니다' },
+                    { icon: '🔵', bg: '#CCFBF1', name: 'NHN Cloud', desc: '완성된 컨테이너 이미지를 NHN Cloud 서버에 Pull & Run으로 실 배포합니다' },
+                    { icon: '🤖', bg: '#FEF3C7', name: 'AWS Kiro', desc: 'AI 기반 개발 도구로 Dockerfile 작성과 컨테이너 구성을 효율적으로 진행합니다' }
+                ],
+                outcomes: [
+                    { title: 'Docker 핵심 명령어', desc: 'pull·run·ps·rm 등 컨테이너 생명주기 관리 명령어를 완전히 익힙니다' },
+                    { title: 'Dockerfile 작성', desc: '나만의 웹 페이지를 담은 커스텀 Nginx 이미지를 직접 빌드합니다' },
+                    { title: 'Docker Hub 배포', desc: '빌드한 이미지를 Docker Hub에 Push하고 어디서든 Pull할 수 있게 합니다' },
+                    { title: 'NHN Cloud 실 배포', desc: '클라우드 서버에서 내 컨테이너를 실행하여 실제 서비스를 완성합니다' }
+                ],
+                targets: ['💻 컴퓨터공학과 재학생', '🐳 Docker를 처음 배우는 분', '☁️ 클라우드 배포 경험을 쌓고 싶은 분', '🏗️ MSA·컨테이너 아키텍처에 관심 있는 분'],
+                ctaTitle: 'Cloud Native 아키텍처 과정 신청하세요',
+                ctaDesc: '2학기 고급컴공 과정 | 5일 오프라인 집중 실습\nAI 데이터SW 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[1학기] 제조설비 AI모델링(고급기계) [30H/8일]': {
+                classLabel: '고급기계',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '1학기 고급과정 · 고급기계',
+                color: '#B45309',
+                colorLight: '#FFFBEB',
+                heroTitle: '제조설비',
+                heroTitleSub: 'AI모델링',
+                heroDesc: '제조 현장의 센서 데이터를 직접 분석하고\n이상 탐지·불량 예측 AI 모델을 만듭니다.\n파이썬으로 데이터를 전처리하고\n실제 제조 문제를 AI로 해결합니다.',
+                stats: [
+                    { num: '30H', label: '총 교육 시수' },
+                    { num: '8일', label: '오프라인 집중 수업' },
+                    { num: 'Python', label: '핵심 언어' },
+                    { num: '이상탐지', label: '핵심 기술' }
+                ],
+                scheduleText: '제조설비 AI모델링 수업 일정',
+                scheduleDesc: '8일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🐍', bg: '#FEF3C7', name: 'Python / Colab', desc: '구글 코랩 환경에서 제조 센서 데이터를 불러오고 분석·시각화합니다' },
+                    { icon: '📊', bg: '#ECFDF5', name: 'Scikit-learn', desc: '이상 탐지 및 불량 예측 머신러닝 모델을 학습하고 평가합니다' },
+                    { icon: '🤖', bg: '#F3E8FF', name: 'weeai', desc: 'AI 플랫폼으로 데이터 분석 과정을 보조하고 결과를 해석합니다' }
+                ],
+                outcomes: [
+                    { title: '센서 데이터 분석', desc: '제조 설비의 진동·온도 센서 데이터를 파이썬으로 불러오고 구조를 파악합니다' },
+                    { title: '데이터 시각화', desc: '시계열 그래프와 분포도로 센서 데이터의 패턴과 이상 징후를 시각화합니다' },
+                    { title: '전처리 및 특성 공학', desc: '결측치 처리·이상치 제거·파생 변수 생성으로 모델 입력 데이터를 정제합니다' },
+                    { title: '이상 탐지 모델 완성', desc: '불량 예측 모델을 학습·평가하고 제조 현장 적용 방안을 발표합니다' }
+                ],
+                targets: ['⚙️ 기계자동차공학과 재학생', '🏭 제조 현장 AI 도입에 관심 있는 분', '📊 데이터 분석을 처음 배우는 분', '🤖 제조 AI 전문가를 목표로 하는 분'],
+                ctaTitle: '제조설비 AI모델링 과정 신청하세요',
+                ctaDesc: '1학기 고급기계 과정 | 8일 오프라인 집중 실습\n제조AI 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            },
+            '[2학기] Digital Twin 기반 공정 시뮬레이션(고급) [30H/8일]': {
+                classLabel: '고급기계',
+                classDays: ['오프라인', '집중과정'],
+                badgeText: '2학기 고급과정 · 고급기계',
+                color: '#0F766E',
+                colorLight: '#F0FDFA',
+                heroTitle: 'Digital Twin',
+                heroTitleSub: '공정 시뮬레이션',
+                heroDesc: '실제 제조 공정을 가상으로 복제하고\n파이썬으로 시뮬레이션을 직접 실행합니다.\n병목 현상을 찾아내고 파라미터를 최적화하여\n공정 개선 방안을 데이터로 제안합니다.',
+                stats: [
+                    { num: '30H', label: '총 교육 시수' },
+                    { num: '8일', label: '오프라인 집중 수업' },
+                    { num: 'SimPy', label: '핵심 라이브러리' },
+                    { num: '최적화', label: '핵심 목표' }
+                ],
+                scheduleText: 'Digital Twin 공정 시뮬레이션 수업 일정',
+                scheduleDesc: '8일 집중 과정 | 전일 오프라인 실습',
+                tools: [
+                    { icon: '🐍', bg: '#FEF3C7', name: 'Python / SimPy', desc: '이벤트 기반 시뮬레이션 라이브러리 SimPy로 제조 공정을 코드로 구현합니다' },
+                    { icon: '📈', bg: '#ECFDF5', name: 'Matplotlib', desc: '시뮬레이션 결과를 시각화하여 공정 병목과 최적 파라미터를 직관적으로 파악합니다' },
+                    { icon: '🤖', bg: '#F3E8FF', name: 'weeai', desc: 'AI 플랫폼으로 시뮬레이션 결과를 분석하고 공정 개선 인사이트를 도출합니다' }
+                ],
+                outcomes: [
+                    { title: 'Digital Twin 개념 이해', desc: 'DT의 원리와 제조 현장 적용 사례를 이해하고 시뮬레이션 구성 요소를 파악합니다' },
+                    { title: '공정 시뮬레이션 구현', desc: 'SimPy로 단순·다단계 공정을 코드로 구현하고 실행 결과를 해석합니다' },
+                    { title: '병목 현상 분석', desc: '시뮬레이션 로그에서 대기열 발생 지점을 찾아 병목 원인을 분석합니다' },
+                    { title: '파라미터 최적화 발표', desc: '다양한 시나리오 실험으로 최적 공정 조건을 도출하고 결과를 발표합니다' }
+                ],
+                targets: ['⚙️ 기계자동차공학과 재학생', '🏭 스마트 팩토리에 관심 있는 분', '📊 데이터 기반 공정 개선을 배우고 싶은 분', '🤖 제조 AI 전문가를 목표로 하는 분'],
+                ctaTitle: 'Digital Twin 공정 시뮬레이션 과정 신청하세요',
+                ctaDesc: '2학기 고급기계 과정 | 8일 오프라인 집중 실습\n제조AI 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaBtn: '수강 신청 →'
+            }
+        };
+
+        window.generatePosterHTML = function(trackKey, courseIndex) {
+            const data = curriculumData[trackKey];
+            if (!data) return '<p class="p-8 text-center text-slate-500">데이터를 불러올 수 없습니다.</p>';
+
+            const course = data.courses[courseIndex];
+            if (!course) return '<p class="p-8 text-center text-slate-500">과정 데이터가 없습니다.</p>';
+
+            const meta = posterMeta[course.name];
+            if (!meta) {
+                return `<div style="font-family:sans-serif;padding:60px;text-align:center;background:#f8fafc;border-radius:12px;">
+                    <div style="font-size:48px;margin-bottom:16px;">🚧</div>
+                    <h2 style="font-size:20px;font-weight:bold;color:#334155;margin-bottom:8px;">${course.name.split(' [')[0]}</h2>
+                    <p style="color:#64748b;">이 과정의 포스터는 준비 중입니다.</p>
+                </div>`;
+            }
+
+            const c = meta.color;
+            const cl = meta.colorLight;
+
+            // 일차별 커리큘럼 카드 생성
+            let dayCardsHTML = '';
+            course.days.forEach((day, i) => {
+                const isBlue = i % 2 === 1;
+                const tagBg = isBlue ? c : '#1C1917';
+                const summary = day.lessons.map(l => l.content).join(' / ').substring(0, 80) + '...';
+                const tags = day.lessons.map(l => {
+                    const m = l.method.replace(/\s*\(.*?\)/g, '');
+                    return `<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:2px;background:#F1F5F9;color:#475569;">${m}</span>`;
+                }).join('');
+                dayCardsHTML += `
+                <div style="display:grid;grid-template-columns:90px 1fr;border:1px solid #E7E0D0;border-radius:4px;overflow:hidden;margin-bottom:10px;">
+                    <div style="padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:${tagBg};">
+                        <span style="font-size:15px;font-weight:900;color:white;line-height:1;">${i+1}일차</span>
+                        <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);margin-top:3px;">오프라인</span>
+                    </div>
+                    <div style="padding:14px 18px;background:white;">
+                        <div style="font-size:13px;font-weight:900;color:#111;margin-bottom:5px;">${day.day.replace(' (오프라인 실습)', '').replace(' (온라인)', '')}</div>
+                        <div style="font-size:12px;color:#57534E;line-height:1.5;margin-bottom:8px;">${day.lessons[0].content}</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;">${tags}</div>
+                    </div>
+                </div>`;
+            });
+
+            const statsHTML = meta.stats.map(s => `
+                <div style="flex:1;padding:14px 16px;border-right:1px solid rgba(255,255,255,0.1);text-align:center;">
+                    <span style="font-size:24px;font-weight:900;color:#F59E0B;display:block;line-height:1;margin-bottom:4px;">${s.num}</span>
+                    <span style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.06em;">${s.label}</span>
+                </div>`).join('');
+
+            const toolsHTML = meta.tools.map(t => `
+                <div style="border:1px solid #E7E0D0;border-radius:4px;padding:16px;background:white;">
+                    <div style="width:36px;height:36px;border-radius:8px;background:${t.bg};display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;">${t.icon}</div>
+                    <div style="font-size:13px;font-weight:900;color:#111;margin-bottom:4px;">${t.name}</div>
+                    <div style="font-size:11px;color:#57534E;line-height:1.5;">${t.desc}</div>
+                </div>`).join('');
+
+            const outcomesHTML = meta.outcomes.map((o, i) => `
+                <div style="display:flex;align-items:flex-start;gap:12px;">
+                    <span style="font-size:24px;font-weight:900;color:#E7E0D0;line-height:1;flex-shrink:0;">0${i+1}</span>
+                    <div>
+                        <div style="font-size:13px;font-weight:900;color:#111;margin-bottom:3px;">${o.title}</div>
+                        <div style="font-size:11px;color:#57534E;line-height:1.5;">${o.desc}</div>
+                    </div>
+                </div>`).join('');
+
+            const targetsHTML = meta.targets.map(t => `
+                <div style="background:#1C1917;color:white;padding:10px 16px;border-radius:2px;font-size:12px;font-weight:500;">${t}</div>`).join('');
+
+            const classDaysHTML = meta.classDays.map(d => `
+                <span style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:white;font-size:14px;font-weight:900;padding:5px 14px;border-radius:3px;">${d}</span>`).join('');
+
+            return `
+            <div style="width:700px;background:#FFFBF0;font-family:'Noto Sans KR',sans-serif;box-shadow:0 20px 60px rgba(0,0,0,0.3);margin:0 auto;">
+
+                <!-- CLASS BAND -->
+                <div style="background:${c};padding:12px 48px;display:flex;align-items:center;justify-content:space-between;">
+                    <div style="display:flex;align-items:center;gap:14px;">
+                        <span style="font-size:28px;font-weight:900;color:white;">${meta.classLabel}</span>
+                        <div style="width:1px;height:28px;background:rgba(255,255,255,0.3);"></div>
+                        <span style="font-size:13px;color:rgba(255,255,255,0.9);font-weight:700;">${course.name.split(' [')[0]} · 오프라인 과정</span>
+                    </div>
+                    <div style="display:flex;gap:8px;">${classDaysHTML}</div>
+                </div>
+
+                <!-- HERO -->
+                <div style="background:#1C1917;padding:44px 48px 40px;position:relative;overflow:hidden;">
+                    <div style="margin-bottom:20px;">
+                        <span style="background:#F59E0B;color:#1C1917;font-size:11px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:2px;">${meta.badgeText}</span>
+                        <span style="border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;letter-spacing:0.1em;padding:4px 12px;border-radius:2px;margin-left:8px;">2026 첨단분야 인재양성 부트캠프</span>
+                    </div>
+                    <p style="font-size:12px;color:#F59E0B;font-weight:500;letter-spacing:0.08em;margin-bottom:8px;">광주대학교 · AI·클라우드 부트캠프</p>
+                    <h1 style="font-size:52px;font-weight:900;color:white;line-height:1.1;margin-bottom:4px;letter-spacing:-0.03em;">
+                        ${meta.heroTitle}<span style="color:#F59E0B;display:block;">${meta.heroTitleSub}</span>
+                    </h1>
+                    <p style="font-size:14px;color:rgba(255,255,255,0.8);line-height:1.8;margin-top:16px;max-width:500px;">${meta.heroDesc.replace(/\n/g,'<br>')}</p>
+                    <div style="display:flex;margin-top:28px;border:1px solid rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;">
+                        ${statsHTML}
+                    </div>
+                </div>
+
+                <!-- SCHEDULE BAR -->
+                <div style="background:${cl};border-left:4px solid ${c};padding:14px 48px;display:flex;align-items:center;gap:20px;">
+                    <span style="font-size:18px;">📅</span>
+                    <span style="font-size:13px;font-weight:700;color:${c};">${meta.scheduleText} <span style="font-weight:400;color:#1e40af;margin-left:8px;">${meta.scheduleDesc}</span></span>
+                </div>
+
+                <!-- CURRICULUM -->
+                <div style="padding:40px 48px;border-bottom:1px solid #E7E0D0;">
+                    <p style="font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#92400E;margin-bottom:10px;">Curriculum</p>
+                    <h2 style="font-size:22px;font-weight:900;color:#111;margin-bottom:20px;letter-spacing:-0.03em;">${course.days.length}일 일차별 커리큘럼</h2>
+                    ${dayCardsHTML}
+                </div>
+
+                <!-- TOOLS -->
+                <div style="padding:40px 48px;background:#FAF7F0;border-bottom:1px solid #E7E0D0;">
+                    <p style="font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#92400E;margin-bottom:10px;">Tools & Tech</p>
+                    <h2 style="font-size:22px;font-weight:900;color:#111;margin-bottom:18px;">활용 도구 & 기술</h2>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">${toolsHTML}</div>
+                </div>
+
+                <!-- OUTCOMES -->
+                <div style="padding:40px 48px;border-bottom:1px solid #E7E0D0;">
+                    <p style="font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#92400E;margin-bottom:10px;">Learning Outcomes</p>
+                    <h2 style="font-size:22px;font-weight:900;color:#111;margin-bottom:18px;">수료 후 이런 걸 할 수 있어요</h2>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${outcomesHTML}</div>
+                </div>
+
+                <!-- TARGET -->
+                <div style="padding:40px 48px;background:#FAF7F0;border-bottom:1px solid #E7E0D0;">
+                    <p style="font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#92400E;margin-bottom:10px;">Who Should Join</p>
+                    <h2 style="font-size:22px;font-weight:900;color:#111;margin-bottom:16px;">이런 분께 추천합니다</h2>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;">${targetsHTML}</div>
+                </div>
+
+                <!-- CTA -->
+                <div style="background:${c};padding:32px 48px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;">
+                    <div>
+                        <h3 style="font-size:22px;font-weight:900;color:white;margin-bottom:8px;">${meta.ctaTitle}</h3>
+                        <p style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.7;">${meta.ctaDesc.replace(/\n/g,'<br>')}</p>
+                    </div>
+                    <div style="background:white;color:${c};padding:14px 24px;font-size:14px;font-weight:900;border-radius:3px;white-space:nowrap;">${meta.ctaBtn}</div>
+                </div>
+
+                <!-- ORG LINE -->
+                <div style="background:#F5EFE0;padding:12px 48px;display:flex;align-items:center;justify-content:space-between;">
+                    <span style="font-size:11px;color:#78716C;">주관 <strong style="color:#92400E;">광주대학교</strong></span>
+                    <span style="font-size:11px;color:#78716C;">2026 <strong style="color:#92400E;">첨단분야 인재양성</strong> 부트캠프</span>
+                    <span style="font-size:11px;color:#78716C;">운영 플랫폼 <strong style="color:#92400E;">weeai · AWS · NHN Cloud</strong></span>
+                </div>
+            </div>`;
+        };
+
+        // === Poster Modal ===
+        window.openPosterModal = function() {
+            const posterBtn = document.getElementById('detail-poster-btn');
+            if (!posterBtn) return;
+            const trackKey = posterBtn._trackKey;
+            const courseIndex = posterBtn._courseIndex;
+            if (trackKey === undefined || courseIndex === undefined) return;
+
+            const html = window.generatePosterHTML(trackKey, courseIndex);
+            const content = document.getElementById('poster-content');
+            if (content) content.innerHTML = html;
+
+            const modal = document.getElementById('poster-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        };
+
+        window.closePosterModal = function() {
+            const modal = document.getElementById('poster-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.downloadPoster = function() {
+            const content = document.getElementById('poster-content');
+            if (!content || !content.innerHTML) return;
+
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`<!DOCTYPE html><html lang="ko"><head>
+                <meta charset="UTF-8">
+                <title>과정 포스터</title>
+                <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 portrait; margin: 0; }
+                    body { margin: 0; padding: 0; background: white; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head><body>${content.innerHTML}</body></html>`);
+            printWin.document.close();
+            printWin.onload = function() {
+                printWin.focus();
+                printWin.print();
+                printWin.close();
+            };
         };
 
         // === Edit Lock ===
