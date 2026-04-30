@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -392,7 +393,7 @@
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="p-4 font-bold text-emerald-700 border-r border-slate-100" rowspan="2">제조AI<br>(기계자동차)</td>
                                     <td class="p-4 font-medium text-blue-700">제조설비 AI모델링(고급기계)</td>
-                                    <td class="p-4 text-center">1</td>
+                                    <td class="p-4 text-center">2</td>
                                     <td class="p-4 text-center font-semibold">30 (8일)</td>
                                     <td class="p-3 text-center">
                                         <div class="flex flex-wrap gap-1 justify-center">
@@ -457,6 +458,12 @@
                             <i class="fas fa-file-pdf"></i>
                             <span>PDF 저장</span>
                         </button>
+                        <!-- 엑셀 저장 버튼 -->
+                        <button onclick="window.exportToExcel()"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-emerald-600 text-white border-emerald-500 hover:bg-emerald-700 no-print">
+                            <i class="fas fa-file-excel"></i>
+                            <span>엑셀 저장</span>
+                        </button>
                     </div>
                 </div>
                 <p class="mb-6 text-slate-600 text-sm md:text-base">빈칸에 과목과 담당자를 선택하여 진도를 기입하세요. 날짜를 클릭하면 달력이 팝업되며, <strong>날짜 옆 '+' 버튼을 눌러 하루에 여러 강의를 추가할 수 있습니다.</strong></p>
@@ -486,9 +493,10 @@
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">날짜</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">요일</th>
                                 <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 36%;">1학기 과정 배정</th>
-                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 12%;">담당</th>
+                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 10%;">담당</th>
+                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 10%;">보조강사</th>
                                 <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 8%;">방식</th>
-                                <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">비고</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm text-slate-700" id="tbody-sem1">
@@ -507,9 +515,10 @@
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">날짜</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">요일</th>
                                 <th class="p-3 border border-slate-700 bg-indigo-900 font-bold text-indigo-100" style="width: 36%;">2학기 과정 배정</th>
-                                <th class="p-3 border border-slate-700 bg-indigo-800 font-bold text-indigo-100" style="width: 12%;">담당</th>
+                                <th class="p-3 border border-slate-700 bg-indigo-800 font-bold text-indigo-100" style="width: 10%;">담당</th>
+                                <th class="p-3 border border-slate-700 bg-indigo-800 font-bold text-indigo-100" style="width: 10%;">보조강사</th>
                                 <th class="p-3 border border-slate-700 bg-indigo-800 font-bold text-indigo-100" style="width: 8%;">방식</th>
-                                <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">비고</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm text-slate-700" id="tbody-sem2">
@@ -635,6 +644,85 @@
                 }
             });
             return conflict;
+        };
+
+        // 같은 날 같은 강사(주강사/보조강사) 중복 체크
+        // selectEl: 변경된 select, newVal: 새 값, fieldClass: 'manager-select' 또는 'assistant-select'
+        window.checkSameDayInstructorConflict = function(selectEl, newVal, fieldClass) {
+            if (!newVal) return null;
+            const tr = selectEl.closest('tr');
+            const tbody = selectEl.closest('tbody');
+            if (!tr || !tbody) return null;
+            const dateInput = tr.querySelector('.date-input');
+            if (!dateInput || !dateInput.value) return null;
+            const dateVal = dateInput.value;
+
+            let conflictRole = null;
+            tbody.querySelectorAll('tr').forEach(otherTr => {
+                if (otherTr === tr || conflictRole) return;
+                const otherDate = otherTr.querySelector('.date-input');
+                if (!otherDate || otherDate.value !== dateVal) return;
+                // 주강사 비교
+                const otherManager = otherTr.querySelector('.manager-select');
+                if (otherManager && otherManager.value === newVal) {
+                    conflictRole = '주강사';
+                }
+                // 보조강사 비교
+                const otherAssistant = otherTr.querySelector('.assistant-select');
+                if (otherAssistant && otherAssistant.value === newVal) {
+                    conflictRole = '보조강사';
+                }
+            });
+            return conflictRole; // null이면 충돌 없음
+        };
+
+        // 공통중급 주당 최대 2일 체크
+        // 같은 주(월~금)에 이미 공통중급이 2일 이상 배정되어 있으면 true 반환
+        window.checkWeeklyMidLevelLimit = function(selectEl, newVal) {
+            const cat = window.getCourseLevel(newVal);
+            if (cat !== '공통중급') return false;
+
+            const tr = selectEl.closest('tr');
+            const tbody = selectEl.closest('tbody');
+            if (!tr || !tbody) return false;
+            const dateInput = tr.querySelector('.date-input');
+            if (!dateInput || !dateInput.value) return false;
+
+            const d = new Date(dateInput.value);
+            // 해당 날짜가 속한 주의 월요일~금요일 날짜 범위 계산
+            const day = d.getDay(); // 0=일, 1=월 ...
+            const monday = new Date(d);
+            monday.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
+            const friday = new Date(monday);
+            friday.setDate(monday.getDate() + 4);
+
+            const toStr = (dt) => dt.toISOString().slice(0, 10);
+            const monStr = toStr(monday);
+            const friStr = toStr(friday);
+
+            let count = 0;
+            tbody.querySelectorAll('tr').forEach(otherTr => {
+                if (otherTr === tr) return;
+                const otherDate = otherTr.querySelector('.date-input');
+                if (!otherDate || !otherDate.value) return;
+                if (otherDate.value < monStr || otherDate.value > friStr) return;
+                const otherSel = otherTr.querySelector('.course-select');
+                if (!otherSel || !otherSel.value) return;
+                if (window.getCourseLevel(otherSel.value) === '공통중급') count++;
+            });
+            return count >= 3;
+        };
+
+        // 페픽 담당자 요일 제한 체크 (화/수/목만 허용)
+        window.checkPepikDayLimit = function(selectEl, newVal) {
+            if (newVal !== '페픽') return false;
+            const tr = selectEl.closest('tr');
+            if (!tr) return false;
+            const dateInput = tr.querySelector('.date-input');
+            if (!dateInput || !dateInput.value) return false;
+            const d = new Date(dateInput.value);
+            const day = d.getDay(); // 2=화, 3=수, 4=목
+            return !(day === 2 || day === 3 || day === 4);
         };
 
         window.switchView = function(viewId) {
@@ -771,7 +859,7 @@
                 color: 'emerald',
                 courses: [
                     {
-                        name: '[1학기] 제조설비 AI모델링(고급기계) [30H/8일]',
+                        name: '[2학기] 제조설비 AI모델링(고급기계) [30H/8일]',
                         goal: '제조 현장의 AI 활용 사례를 이해하고, 센서 데이터를 시각화하며 이상 탐지 및 불량 예측 모델을 직접 실행·해석하여 실제 현장 적용 방안을 제안할 수 있습니다.',
                         days: [
                             { day: '1일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '과정 오리엔테이션 및 데이터 기반 문제 해결 프로세스 안내', method: '강의/안내 (오프라인)' }, { time: '2교시 (1H)', content: '제조 AI 핵심 개념과 실제 산업 적용 사례 시청', method: '사례연구 (오프라인)' }, { time: '3교시 (1H)', content: '"왜 AI인가?" 비전공자 눈높이에 맞춘 제조 현장의 문제 해결 경험 토의', method: '토의/실습 (오프라인)' } ] },
@@ -813,7 +901,7 @@
             '[1학기] 클라우드입문(30H)': 8,
             '[1학기] ML/딥러닝 기초(15H)': 5,
             '[1학기] LLM 애플리케이션(15H)': 5,
-            '[1학기] 제조설비 AI모델링(30H)': 8,
+            '[2학기] 제조설비 AI모델링(30H)': 8,
             '[2학기] NHN/AWS 멀티클라우드(15H)': 5,
             '[2학기] MLOps(15H)': 5,
             '[2학기] Cloud Native(15H)': 5,
@@ -1047,7 +1135,7 @@
                          <option value="[1학기] LLM 애플리케이션(15H)">[고급컴공] LLM 애플리케이션(15H)</option>
                        </optgroup>
                        <optgroup label="🟤 고급 기계">
-                         <option value="[1학기] 제조설비 AI모델링(30H)">[고급기계] 제조설비 AI모델링(30H)</option>
+                         <option value="[2학기] 제조설비 AI모델링(30H)">[고급기계] 제조설비 AI모델링(30H)</option>
                        </optgroup>`
                     : `<option value="">과정 선택</option>
                        <optgroup label="🔴 고급 컴공">
@@ -1097,6 +1185,11 @@
                         <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
                             <select class="manager-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
                                 <option value="">-</option><option>으뜸(송민)</option><option>으뜸(김수종)</option><option>페픽</option><option>AWS</option><option>NHN</option>
+                            </select>
+                        </td>
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
+                            <select class="assistant-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
+                                <option value="">-</option><option>으뜸(송유란)</option><option>으뜸(남현주)</option><option>으뜸(박남진)</option>
                             </select>
                         </td>
                         <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
@@ -1208,7 +1301,7 @@
                     s.classList.add('text-slate-700');
                     const isSem1 = tr.id?.includes('s1') || tr.closest('tbody')?.id === 'tbody-sem1';
                     if(s.classList.contains('course-select')) s.parentElement.classList.add(isSem1 ? 'bg-blue-50/20' : 'bg-indigo-50/20');
-                    if(s.classList.contains('manager-select') || s.classList.contains('method-select')) s.parentElement.classList.add(isSem1 ? 'bg-blue-50/40' : 'bg-indigo-50/40');
+                    if(s.classList.contains('manager-select') || s.classList.contains('method-select') || s.classList.contains('assistant-select')) s.parentElement.classList.add(isSem1 ? 'bg-blue-50/40' : 'bg-indigo-50/40');
                 });
                 if(noteInput) {
                     noteInput.classList.remove('text-red-500', 'font-bold');
@@ -1244,7 +1337,7 @@
         window.executeReset = function() {
             document.querySelectorAll('.dynamic-row').forEach(row => row.remove());
             
-            const selects = document.querySelectorAll('#view-schedule .course-select, #view-schedule .manager-select, #view-schedule .method-select');
+            const selects = document.querySelectorAll('#view-schedule .course-select, #view-schedule .manager-select, #view-schedule .method-select, #view-schedule .assistant-select');
             selects.forEach(el => {
                 el.value = "";
                 if(el.classList.contains('course-select')) el.prevValue = "";
@@ -1310,9 +1403,12 @@
                 'sel-c-prompt','sel-c-cloud','sel-c-ml','sel-c-llm','sel-c-factory','sel-c-aidata',
                 'sel-c-design','sel-c-multi','sel-c-mlops','sel-c-native','sel-c-digital'
             );
-            if      (val === '으뜸(송민)')   selectElement?.classList?.add('sel-manager-eu');
-            else if (val === '으뜸(김수종)') selectElement?.classList?.add('sel-manager-eu2');
-            else if (val === '으뜸')         selectElement?.classList?.add('sel-manager-eu'); // 구버전 호환
+            if      (val === '으뜸(송민)')    selectElement?.classList?.add('sel-manager-eu');
+            else if (val === '으뜸(김수종)')  selectElement?.classList?.add('sel-manager-eu2');
+            else if (val === '으뜸(송유란)')  selectElement?.classList?.add('sel-manager-eu');
+            else if (val === '으뜸(남현주)')  selectElement?.classList?.add('sel-manager-eu2');
+            else if (val === '으뜸(박남진)')  selectElement?.classList?.add('sel-manager-eu');
+            else if (val === '으뜸')          selectElement?.classList?.add('sel-manager-eu'); // 구버전 호환
             else if (val === '페픽') selectElement?.classList?.add('sel-manager-pe');
             else if (val === 'AWS')  selectElement?.classList?.add('sel-manager-aws');
             else if (val === 'NHN')  selectElement?.classList?.add('sel-manager-nhn');
@@ -1328,6 +1424,116 @@
             else if (val.includes('Digital Twin'))        selectElement?.classList?.add('sel-c-digital');
             else if (val.includes('[1학기]')) selectElement?.classList?.add('sel-course-1');
             else if (val.includes('[2학기]')) selectElement?.classList?.add('sel-course-2');
+        };
+
+        // === Excel Export ===
+        window.exportToExcel = function() {
+            // 30H 과목 판별 (8일 운영: 1~7일차 4H, 마지막날 2H)
+            const is30H = (courseVal) => courseVal.includes('(30H)');
+
+            // 일정표에서 과정별 데이터 수집
+            // 구조: { 과정명: [ { date, manager, assistant, hours } ] }
+            const courseMap = {};
+
+            ['tbody-sem1', 'tbody-sem2'].forEach(tbodyId => {
+                const tbody = document.getElementById(tbodyId);
+                if (!tbody) return;
+
+                // 날짜별로 행 그룹화 (같은 날 여러 행 처리)
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    const courseVal = tr.querySelector('.course-select')?.value || '';
+                    if (!courseVal) return;
+                    const dateVal   = tr.querySelector('.date-input')?.value    || '';
+                    const manager   = tr.querySelector('.manager-select')?.value   || '-';
+                    const assistant = tr.querySelector('.assistant-select')?.value || '-';
+                    if (!dateVal) return;
+
+                    if (!courseMap[courseVal]) courseMap[courseVal] = [];
+                    courseMap[courseVal].push({ date: dateVal, manager, assistant });
+                });
+            });
+
+            if (Object.keys(courseMap).length === 0) {
+                window.showToast('배정된 강의 일정이 없습니다.', 'warning');
+                return;
+            }
+
+            // 과정명 표시용 정리 (학기 태그 제거 + 등급 접두어 추가)
+            const getLevelPrefix = (key) => {
+                if (key.includes('프롬프트엔지니어링'))                        return '[초급] ';
+                if (key.includes('클라우드입문') || key.includes('ML/딥러닝')) return '[중급] ';
+                if (key.includes('LLM 애플리케이션') || key.includes('멀티클라우드') ||
+                    key.includes('MLOps') || key.includes('Cloud Native'))     return '[고급-컴공] ';
+                if (key.includes('제조설비') || key.includes('Digital Twin'))  return '[고급-기계] ';
+                return '';
+            };
+            const displayName = (key) => getLevelPrefix(key) + key.replace(/^\[.*?\]\s*/, '').replace(/\s*\[.*?\]$/, '');
+
+            // 중복 날짜 체크 (같은 과목에 같은 날짜가 두 번 이상 배정된 경우 경고)
+            const dupWarnings = [];
+            for (const [courseVal, rows] of Object.entries(courseMap)) {
+                const dateCounts = {};
+                rows.forEach(r => { dateCounts[r.date] = (dateCounts[r.date] || 0) + 1; });
+                Object.entries(dateCounts).forEach(([date, cnt]) => {
+                    if (cnt > 1) dupWarnings.push(`${displayName(courseVal)} - ${date} (${cnt}회)`);
+                });
+            }
+            if (dupWarnings.length > 0) {
+                window.showToast(`중복 배정 감지:\n${dupWarnings.join('\n')}`, 'warning');
+                return;
+            }
+
+            // CSV 내용 생성 (과정별 시트 구분은 CSV 단일 파일로, 과정 사이 빈 행으로 구분)
+            let csvRows = [];
+            csvRows.push(['2026 첨단분야 인재양성 부트캠프 - 과정별 강의 일정']);
+            csvRows.push([]);
+
+            for (const [courseVal, rows] of Object.entries(courseMap)) {
+                const name = displayName(courseVal);
+                const totalDays = rows.length;
+                const is30 = is30H(courseVal);
+
+                // 시간 계산: 30H → 1~(n-1)일 4H, 마지막날 2H / 15H → 전일 3H
+                const getHours = (idx) => {
+                    if (is30) return idx < totalDays - 1 ? 4 : 2;
+                    return 3;
+                };
+                const totalHours = rows.reduce((sum, _, i) => sum + getHours(i), 0);
+
+                // 과정 헤더
+                csvRows.push([`[과정명] ${name}`, '', '', '', `총 ${totalHours}H / ${totalDays}일`]);
+                csvRows.push(['날짜', '요일', '주강사', '보조강사', '시간(H)']);
+
+                rows.forEach((row, i) => {
+                    const d = new Date(row.date);
+                    const dayStr = ['일','월','화','수','목','금','토'][d.getDay()];
+                    const hours = getHours(i);
+                    csvRows.push([row.date, dayStr, row.manager, row.assistant, `${hours}H`]);
+                });
+
+                csvRows.push(['', '', '', '합계', `${totalHours}H`]);
+                csvRows.push([]); // 과정 간 빈 행
+            }
+
+            // CSV 문자열 변환 (BOM 포함 → 한글 깨짐 방지)
+            const csvContent = '\uFEFF' + csvRows.map(row =>
+                row.map(cell => {
+                    const s = String(cell ?? '');
+                    return s.includes(',') || s.includes('"') || s.includes('\n')
+                        ? `"${s.replace(/"/g, '""')}"` : s;
+                }).join(',')
+            ).join('\r\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '부트캠프_과정별_강의일정.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            window.showToast('엑셀(CSV) 파일이 저장되었습니다.', 'success');
         };
 
         // === PDF Print ===
@@ -1619,10 +1825,10 @@
                 ctaDesc: '2학기 고급컴공 과정 | 5일 오프라인 집중 실습\nAI 데이터SW 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
                 ctaBtn: '수강 신청 →'
             },
-            '[1학기] 제조설비 AI모델링(고급기계) [30H/8일]': {
+            '[2학기] 제조설비 AI모델링(고급기계) [30H/8일]': {
                 classLabel: '고급기계',
                 classDays: ['오프라인', '집중과정'],
-                badgeText: '1학기 고급과정 · 고급기계',
+                badgeText: '2학기 고급과정 · 고급기계',
                 color: '#B45309',
                 colorLight: '#FFFBEB',
                 heroTitle: '제조설비',
@@ -1649,7 +1855,7 @@
                 ],
                 targets: ['⚙️ 기계자동차공학과 재학생', '🏭 제조 현장 AI 도입에 관심 있는 분', '📊 데이터 분석을 처음 배우는 분', '🤖 제조 AI 전문가를 목표로 하는 분'],
                 ctaTitle: '제조설비 AI모델링 과정 신청하세요',
-                ctaDesc: '1학기 고급기계 과정 | 8일 오프라인 집중 실습\n제조AI 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
+                ctaDesc: '2학기 고급기계 과정 | 8일 오프라인 집중 실습\n제조AI 트랙 핵심 과정입니다.\n문의: 광주대학교 AI·클라우드 부트캠프 운영팀',
                 ctaBtn: '수강 신청 →'
             },
             '[2학기] Digital Twin 기반 공정 시뮬레이션(고급) [30H/8일]': {
@@ -1957,12 +2163,63 @@
                                 window.updateSelectColor(e.target);
                                 return;
                             }
+                            // 공통중급 주당 최대 2일 체크
+                            if (window.checkWeeklyMidLevelLimit(e.target, val)) {
+                                window.showToast('공통중급 과정은 같은 주에 최대 3일까지만 배정 가능합니다!', 'warning');
+                                e.target.value = e.target.prevValue || "";
+                                window.updateSelectColor(e.target);
+                                return;
+                            }
                         }
                         e.target.prevValue = e.target.value;
                         window.updateSelectColor(e.target);
                         window.updateAllocationStatus();
-                    } else if (e.target.classList.contains('manager-select') || e.target.classList.contains('method-select')) {
+                        // 과목 선택 시 보조강사 자동 입력
+                        const assistantMap = {
+                            'ML/딥러닝':              '으뜸(송유란)',
+                            'LLM 애플리케이션':       '으뜸(송유란)',
+                            '프롬프트엔지니어링 B반': '으뜸(남현주)',
+                            '클라우드입문':           '으뜸(남현주)',
+                            '프롬프트엔지니어링 A반': '으뜸(박남진)',
+                        };
+                        const asSel = e.target.closest('tr')?.querySelector('.assistant-select');
+                        if (asSel && !asSel.value) {
+                            const matched = Object.keys(assistantMap).find(k => e.target.value.includes(k));
+                            if (matched) {
+                                const autoVal = assistantMap[matched];
+                                // 자동 입력 시에도 중복 체크
+                                const conflict = window.checkSameDayInstructorConflict(asSel, autoVal, 'assistant-select');
+                                if (!conflict) {
+                                    asSel.value = autoVal;
+                                    window.updateSelectColor(asSel);
+                                }
+                            }
+                        }
+                    } else if (e.target.classList.contains('manager-select') || e.target.classList.contains('method-select') || e.target.classList.contains('assistant-select')) {
                         window.updateSelectColor(e.target);
+                        // 주강사/보조강사 중복 체크
+                        if (e.target.classList.contains('manager-select') || e.target.classList.contains('assistant-select')) {
+                            const val = e.target.value;
+                            if (val) {
+                                // 페픽 요일 제한 (화/수/목만 허용)
+                                if (e.target.classList.contains('manager-select') && window.checkPepikDayLimit(e.target, val)) {
+                                    window.showToast('페픽 담당자는 화요일·수요일·목요일만 배정 가능합니다!', 'warning');
+                                    e.target.value = '';
+                                    window.updateSelectColor(e.target);
+                                    if (window.saveToFirebase) window.saveToFirebase();
+                                    return;
+                                }
+                                const fieldClass = e.target.classList.contains('manager-select') ? 'manager-select' : 'assistant-select';
+                                const conflictRole = window.checkSameDayInstructorConflict(e.target, val, fieldClass);
+                                if (conflictRole) {
+                                    window.showToast(`같은 날에 이미 ${val}이(가) ${conflictRole}로 배정되어 있습니다!`, 'warning');
+                                    e.target.value = '';
+                                    window.updateSelectColor(e.target);
+                                    if (window.saveToFirebase) window.saveToFirebase();
+                                    return;
+                                }
+                            }
+                        }
                     } else if (e.target.classList.contains('date-input')) {
                         window.updateRowStyle(e.target);
                     }
@@ -2023,11 +2280,12 @@
                 Object.entries(dateGroups).forEach(([dateVal, rows]) => {
                     rows.forEach((tr, rowIdx) => {
                         const key = `${tbodyId}__${dateVal}__${rowIdx}`;
-                        const course  = tr.querySelector('.course-select')?.value  || '';
-                        const manager = tr.querySelector('.manager-select')?.value || '';
-                        const method  = tr.querySelector('.method-select')?.value  || '';
-                        const note    = tr.querySelector('.note-input')?.value     || '';
-                        state[key] = `${course}||${manager}||${method}||${note}`;
+                        const course     = tr.querySelector('.course-select')?.value    || '';
+                        const manager    = tr.querySelector('.manager-select')?.value   || '';
+                        const assistant  = tr.querySelector('.assistant-select')?.value || '';
+                        const method     = tr.querySelector('.method-select')?.value    || '';
+                        const note       = tr.querySelector('.note-input')?.value       || '';
+                        state[key] = `${course}||${manager}||${method}||${note}||${assistant}`;
                     });
                 });
             });
@@ -2128,7 +2386,7 @@
                     const parts = k.split('__');
                     let dateVal = parts[1];
                     const rowIdx  = parseInt(parts[2]);
-                    let [course, manager, method, note] = (data[k] || '').split('||');
+                    let [course, manager, method, note, assistant] = (data[k] || '').split('||');
 
                     // 1학기 날짜 마이그레이션 적용
                     if (tbodyId === 'tbody-sem1') {
@@ -2151,9 +2409,11 @@
                                 const ms = tr.querySelector('.manager-select');
                                 const mts = tr.querySelector('.method-select');
                                 const ni = tr.querySelector('.note-input');
-                                if (cs)  { cs.value  = course;  window.updateSelectColor && window.updateSelectColor(cs); }
-                                if (ms)  { ms.value  = manager; window.updateSelectColor && window.updateSelectColor(ms); }
-                                if (mts) { mts.value = method;  window.updateSelectColor && window.updateSelectColor(mts); }
+                                if (cs)  { cs.value  = course;     window.updateSelectColor && window.updateSelectColor(cs); }
+                                if (ms)  { ms.value  = manager;    window.updateSelectColor && window.updateSelectColor(ms); }
+                                const as = tr.querySelector('.assistant-select');
+                                if (as)  { as.value  = assistant || ''; window.updateSelectColor && window.updateSelectColor(as); }
+                                if (mts) { mts.value = method;     window.updateSelectColor && window.updateSelectColor(mts); }
                                 if (ni)  ni.value = note;
                                 break;
                             }
