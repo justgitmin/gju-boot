@@ -377,12 +377,6 @@
                         </span>
                     </div>
                     <div class="flex items-center gap-3 flex-wrap">
-                        <!-- 편집 잠금 토글 버튼 -->
-                        <button id="edit-lock-btn" onclick="window.toggleEditLock()"
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-slate-700 text-white border-slate-600 hover:bg-slate-600 no-print">
-                            <i id="edit-lock-icon" class="fas fa-lock"></i>
-                            <span id="edit-lock-label">잠금 해제하여 편집</span>
-                        </button>
                         <!-- PDF 저장 버튼 -->
                         <button onclick="window.printSchedule()"
                             class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm border transition-all shadow-sm bg-rose-600 text-white border-rose-500 hover:bg-rose-700 no-print">
@@ -397,17 +391,12 @@
                         </button>
                     </div>
                 </div>
-                <p class="mb-6 text-slate-600 text-sm md:text-base">빈칸에 과목과 담당자를 선택하여 진도를 기입하세요. 날짜를 클릭하면 달력이 팝업되며, <strong>날짜 옆 '+' 버튼을 눌러 하루에 여러 강의를 추가할 수 있습니다.</strong></p>
+                <p class="mb-6 text-slate-600 text-sm md:text-base">2026 첨단분야 인재양성 부트캠프 과정 전체 일정표입니다.</p>
                 
                 <!-- Allocation Dashboard -->
                 <div id="allocation-dashboard-container" class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-2">
                         <h3 class="font-bold text-slate-700 text-sm flex items-center"><i class="fas fa-chart-pie mr-2 text-indigo-500"></i>과정별 시수 배정 현황 (1일=3H)</h3>
-                        <div class="flex gap-2" id="reset-btn-wrap">
-                            <button onclick="resetSchedule()" class="px-3 py-1.5 bg-white text-slate-600 border border-slate-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded text-xs font-bold transition-all flex items-center shadow-sm">
-                                <i class="fas fa-undo-alt mr-1.5"></i>전체 초기화
-                            </button>
-                        </div>
                     </div>
                     <div id="allocation-dashboard" class="flex flex-wrap gap-2">
                         <!-- Badges injected here via JS -->
@@ -423,11 +412,8 @@
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">주차</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">날짜</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">요일</th>
-                                <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 36%;">1학기 과정 배정</th>
-                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 10%;">담당</th>
-                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 10%;">보조강사</th>
-                                <th class="p-3 border border-slate-700 bg-blue-800 font-bold text-blue-100" style="width: 8%;">방식</th>
-                                <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">비고</th>
+                                <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 56%;">1학기 과정 배정</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm text-slate-700" id="tbody-sem1">
@@ -998,8 +984,8 @@
                         ${weekCell}
                         <td class="p-1 border-r ${tdClass} align-middle">
                             <div class="flex items-center justify-center gap-1">
-                                <input type="date" class="date-input w-full max-w-[110px] bg-transparent outline-none text-xs text-center cursor-pointer ${textClass}" value="${dateStr}">
-                                <button type="button" onclick="window.addDailyRow(this)" class="add-row-btn text-indigo-500 hover:text-white hover:bg-indigo-500 bg-indigo-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors" title="이 날짜에 강의 추가">
+                                <input type="date" class="date-input w-full max-w-[110px] bg-transparent outline-none text-xs text-center ${textClass}" value="${dateStr}" readonly>
+                                <button type="button" onclick="window.addDailyRow(this)" class="add-row-btn text-indigo-500 hover:text-white hover:bg-indigo-500 bg-indigo-50 rounded w-5 h-5 flex items-center justify-center shrink-0 transition-colors" title="이 날짜에 강의 추가" style="display:none">
                                     <i class="fas fa-plus text-[10px]"></i>
                                 </button>
                             </div>
@@ -1010,17 +996,17 @@
                                 ${courseOpts}
                             </select>
                         </td>
-                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle" style="display:none">
                             <select class="manager-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
                                 <option value="">-</option><option>으뜸(송민)</option><option>으뜸(김수종)</option><option>페픽</option><option>AWS</option><option>NHN</option>
                             </select>
                         </td>
-                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle" style="display:none">
                             <select class="assistant-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
                                 <option value="">-</option><option>으뜸(송유란)</option><option>으뜸(남현주)</option><option>으뜸(박남진)</option>
                             </select>
                         </td>
-                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle" style="display:none">
                             <select class="method-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
                                 ${methodOpts}
                             </select>
