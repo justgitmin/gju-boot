@@ -412,7 +412,8 @@
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">주차</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">날짜</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 6%;">요일</th>
-                                <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 56%;">1학기 과정 배정</th>
+                                <th class="p-3 border border-slate-700 bg-blue-900 font-bold text-blue-100" style="width: 42%;">1학기 과정 배정</th>
+                                <th class="p-3 border border-slate-700 font-semibold" style="width: 14%;">메인강사</th>
                                 <th class="p-3 border border-slate-700 font-semibold" style="width: 18%;">비고</th>
                             </tr>
                         </thead>
@@ -617,7 +618,7 @@
 
         // 페픽 담당자 요일 제한 체크 (화/수/목만 허용)
         window.checkPepikDayLimit = function(selectEl, newVal) {
-            if (newVal !== '페픽') return false;
+            if (newVal !== '페픽(유연수)') return false;
             const tr = selectEl.closest('tr');
             if (!tr) return false;
             const dateInput = tr.querySelector('.date-input');
@@ -663,7 +664,7 @@
                             { day: '2일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '전일 복습, 나쁜 프롬프트 사례 분석 및 3요소(명확성/구체성/맥락) 학습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '같은 목적, 다른 프롬프트 적용 및 결과 비교 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '프롬프트 개선 챌린지(짝 활동), OX 퀴즈 형성평가 및 정리', method: '협동학습 (오프라인)' } ] },
                             { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Role Prompting(역할 부여) 및 Context Prompting(배경 정보 제공)', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Format Prompting: 원하는 템플릿 양식으로 출력 형식 지정하기', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Chain-of-Thought(단계별 사고 유도) 실습 및 퀴즈 제출', method: '이론/평가 (오프라인)' } ] },
                             { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '활용 시나리오(학업/취업/창작/업무) 소개 및 시나리오별 프롬프트 작성 실습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '모둠별 최고의 프롬프트 선정 및 결과물 개선 논의', method: '모둠활동 (오프라인)' }, { time: '3교시 (1H)', content: '개선된 프롬프트 모둠 발표, 상호 피드백 및 다음 차시 안내', method: '발표/평가 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '프롬프트 북 개념 및 구조 안내, 나만의 프롬프트 북 제작 돌입', method: '강의/제작 (오프라인)' }, { time: '2교시 (1H)', content: '분야별 10개 이상의 프롬프트를 담은 프롬프트 북 문서 완성', method: '개인제작 (오프라인)' }, { time: '3교시 (1H)', content: '결과물 발표, 동료/강사 피드백, 우수작 공유 및 최종 성찰일지 작성', method: '발표/평가 (오프라인)' } ] }
+                            { day: '5일차 (오프라인 평가)', lessons: [ { time: '1교시 (1H)', content: '전체 과정 핵심 내용 복습 및 시험 안내', method: '강의 (오프라인)' }, { time: '2교시 (1H)', content: '과정 평가 시험 (PASS/FAIL)', method: '평가/시험 (오프라인)' }, { time: '3교시 (1H)', content: '시험 결과 피드백, 우수 사례 공유 및 수료식', method: '마무리 (오프라인)' } ] }
                         ]
                     },
                     {
@@ -674,7 +675,7 @@
                             { day: '2일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '전일 복습, 나쁜 프롬프트 사례 분석 및 3요소(명확성/구체성/맥락) 학습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '같은 목적, 다른 프롬프트 적용 및 결과 비교 실습', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '프롬프트 개선 챌린지(짝 활동), OX 퀴즈 형성평가 및 정리', method: '협동학습 (오프라인)' } ] },
                             { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Role Prompting(역할 부여) 및 Context Prompting(배경 정보 제공)', method: '이론/실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Format Prompting: 원하는 템플릿 양식으로 출력 형식 지정하기', method: '이론/실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Chain-of-Thought(단계별 사고 유도) 실습 및 퀴즈 제출', method: '이론/평가 (오프라인)' } ] },
                             { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '활용 시나리오(학업/취업/창작/업무) 소개 및 시나리오별 프롬프트 작성 실습', method: '강의/실습 (오프라인)' }, { time: '2교시 (1H)', content: '모둠별 최고의 프롬프트 선정 및 결과물 개선 논의', method: '모둠활동 (오프라인)' }, { time: '3교시 (1H)', content: '개선된 프롬프트 모둠 발표, 상호 피드백 및 다음 차시 안내', method: '발표/평가 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '프롬프트 북 개념 및 구조 안내, 나만의 프롬프트 북 제작 돌입', method: '강의/제작 (오프라인)' }, { time: '2교시 (1H)', content: '분야별 10개 이상의 프롬프트를 담은 프롬프트 북 문서 완성', method: '개인제작 (오프라인)' }, { time: '3교시 (1H)', content: '결과물 발표, 동료/강사 피드백, 우수작 공유 및 최종 성찰일지 작성', method: '발표/평가 (오프라인)' } ] }
+                            { day: '5일차 (오프라인 평가)', lessons: [ { time: '1교시 (1H)', content: '전체 과정 핵심 내용 복습 및 시험 안내', method: '강의 (오프라인)' }, { time: '2교시 (1H)', content: '과정 평가 시험 (PASS/FAIL)', method: '평가/시험 (오프라인)' }, { time: '3교시 (1H)', content: '시험 결과 피드백, 우수 사례 공유 및 수료식', method: '마무리 (오프라인)' } ] }
                         ]
                     }
                 ]
@@ -694,7 +695,7 @@
                             { day: '5일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: 'AWS 고가용성 아키텍처: ELB(로드밸런서)와 Auto Scaling 개념 이해', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: 'CloudFront CDN 및 Route 53 DNS 서비스의 역할과 구조 파악', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: 'AWS Lambda 서버리스 함수 개념 및 API Gateway 연동 구조 이해', method: '이론강의 (온라인)' }, { time: '4교시 (1H)', content: 'CloudFormation IaC 개념 및 YAML 템플릿 인프라 자동화 입문', method: '이론/퀴즈 (온라인)' } ] },
                             { day: '6일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'Auto Scaling 그룹 생성 및 트래픽 기반 인스턴스 자동 증감 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'Application Load Balancer 구성 및 EC2 인스턴스 타겟 그룹 연결', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '부하 분산 동작 확인 및 비정상 인스턴스 헬스체크 테스트', method: '개인실습 (오프라인)' }, { time: '4교시 (1H)', content: '비용 폭탄 방지(Billing 알람) 설정 및 CloudWatch 기초 모니터링', method: '개인실습 (오프라인)' } ] },
                             { day: '7일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AWS Lambda 첫 함수 생성·실행 및 이벤트 트리거 구성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: 'API Gateway와 Lambda 연동하여 간단한 RESTful API 구축', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'S3 이벤트 트리거로 Lambda 자동 실행 파이프라인 구성 실습', method: '개인실습 (오프라인)' }, { time: '4교시 (1H)', content: '지금까지 구성한 전체 아키텍처 통합 검토 및 비용 최적화 전략 점검', method: '개인실습 (오프라인)' } ] },
-                            { day: '8일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '미니 프로젝트: 나만의 AWS 3-tier 아키텍처 설계 발표', method: '발표/평가 (오프라인)' }, { time: '2교시 (1H)', content: '강사 피드백 및 전체 과정 성찰일지 작성 마무리', method: '마무리 (오프라인)' } ] }
+                            { day: '8일차 (오프라인 평가)', lessons: [ { time: '1교시 (1H)', content: '전체 과정 핵심 내용 복습 및 시험 안내', method: '강의 (오프라인)' }, { time: '2교시 (1H)', content: '과정 평가 시험 (PASS/FAIL)', method: '평가/시험 (오프라인)' } ] }
                         ]
                     },
                     {
@@ -705,7 +706,7 @@
                             { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '인공지능, 머신러닝, 딥러닝의 명확한 차이와 발전 역사', method: '이론강의 (온라인)' }, { time: '2교시 (1H)', content: '지도학습(정답이 있는)과 비지도학습(정답이 없는) 알고리즘 분류', method: '이론강의 (온라인)' }, { time: '3교시 (1H)', content: '머신러닝의 양대 산맥: 분류(Classification)와 회귀(Regression)의 차이', method: '이론/퀴즈 (온라인)' } ] },
                             { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'AI가 공부하는 책, 데이터 셋(Train, Validation, Test) 분할 개념', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: '과적합(Overfitting) 방지 및 모델 평가 지표(정확도 등) 기초', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '학습된 모델의 정확도 테스트 및 인식률 저하(한계점) 체험 개선 실습', method: '개인실습 (오프라인)' } ] },
                             { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코딩 없는 데이터 분석 툴, Orange Data Mining 설치 및 노드 연결 방식 파악', method: '실습안내 (오프라인)' }, { time: '2교시 (1H)', content: '엑셀(CSV) 데이터셋 불러오기 및 Data Table 노드를 통한 원시 데이터 구조 확인', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Scatter Plot 등 시각화 노드를 활용해 데이터 피처간 연관성 흐름 파악하기', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '의사결정나무(Decision Tree) 노드 연결을 통한 타겟 값(생존/사망 등) 예측 모델 생성', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '타이타닉 생존자 데이터를 직접 분석하고, 내가 살 수 있었을지 예측 테스트', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: 'Confusion Matrix 노드로 내 모델의 성적표(정확도) 도출 및 데이터 분석 과정 랩업', method: '마무리/평가 (오프라인)' } ] }
+                            { day: '5일차 (오프라인 평가)', lessons: [ { time: '1교시 (1H)', content: '전체 과정 핵심 내용 복습 및 시험 안내', method: '강의 (오프라인)' }, { time: '2교시 (1H)', content: '과정 평가 시험 (PASS/FAIL)', method: '평가/시험 (오프라인)' }, { time: '3교시 (1H)', content: '시험 결과 피드백, 우수 사례 공유 및 수료식', method: '마무리 (오프라인)' } ] }
                         ]
                     },
                     {
@@ -716,7 +717,7 @@
                             { day: '2일차 (온라인)', lessons: [ { time: '1교시 (1H)', content: '파이썬 데이터의 그릇, 변수와 기본 데이터 타입 파악', method: '온라인실습' }, { time: '2교시 (1H)', content: '상황에 따라 다른 길로 가는 if, elif, else 조건문 문법 기초', method: '온라인실습' }, { time: '3교시 (1H)', content: '데이터를 묶어서 관리하는 파이썬 리스트(List)와 딕셔너리 구조', method: '온라인실습' } ] },
                             { day: '3일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '코드를 반복해서 실행해주는 for 문과 while 문의 문법 구조', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '자주 쓰는 코드를 하나로 묶는 함수(Function) 정의 및 매개변수', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 외부 모듈과 라이브러리(import) 활용의 이해', method: '이론/실습 (오프라인)' } ] },
                             { day: '4일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: '인터넷 통신 프로토콜(HTTP) 기초와 GET/POST 방식의 차이', method: '이론강의 (오프라인)' }, { time: '2교시 (1H)', content: 'REST API 데이터 규격인 JSON 포맷의 구조 분석 및 파싱(Parsing) 이론', method: '이론강의 (오프라인)' }, { time: '3교시 (1H)', content: '파이썬 `requests` 라이브러리를 활용한 HTTP POST 요청 테스트', method: '개인실습 (오프라인)' } ] },
-                            { day: '5일차 (오프라인 실습)', lessons: [ { time: '1교시 (1H)', content: 'LLM API를 호출하여 질문 전송하고 답변 받아보기 실습', method: '개인실습 (오프라인)' }, { time: '2교시 (1H)', content: '복잡한 JSON 응답 데이터에서 실제 AI의 텍스트 답변 내용만 추출(파싱)하기', method: '개인실습 (오프라인)' }, { time: '3교시 (1H)', content: '터미널 챗봇 완성 및 weeai RAG 파이프라인 셋팅, 프로젝트 랩업', method: '발표/배포 (오프라인)' } ] }
+                            { day: '5일차 (오프라인 평가)', lessons: [ { time: '1교시 (1H)', content: '전체 과정 핵심 내용 복습 및 시험 안내', method: '강의 (오프라인)' }, { time: '2교시 (1H)', content: '과정 평가 시험 (PASS/FAIL)', method: '평가/시험 (오프라인)' }, { time: '3교시 (1H)', content: '시험 결과 피드백, 우수 사례 공유 및 수료식', method: '마무리 (오프라인)' } ] }
                         ]
                     }
                 ]
@@ -910,6 +911,7 @@
             '2026-05-01': '근로자의 날',
             '2026-05-05': '어린이날',
             '2026-05-25': '부처님오신날(대체)',
+            '2026-06-03': '지방선거',
             '2026-06-06': '현충일',
             '2026-08-17': '광복절(대체)',
             '2026-09-23': '추석 연휴',
@@ -996,9 +998,9 @@
                                 ${courseOpts}
                             </select>
                         </td>
-                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle" style="display:none">
+                        <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle">
                             <select class="manager-select w-full bg-transparent outline-none border-none text-xs font-semibold cursor-pointer px-1 ${textClass}">
-                                <option value="">-</option><option>으뜸(송민)</option><option>으뜸(김수종)</option><option>페픽</option><option>AWS</option><option>NHN</option>
+                                <option value="">-</option><option>으뜸(송민)</option><option>으뜸(김수종)</option><option>페픽(유연수)</option><option>AWS</option><option>NHN</option>
                             </select>
                         </td>
                         <td class="p-1 border-r ${tdClass} ${bgClassM} text-center align-middle" style="display:none">
@@ -2004,6 +2006,7 @@
         // 담당자명 마이그레이션 (구버전 → 신버전)
         const managerValueMigration = {
             '으뜸': '으뜸(송민)',
+            '페픽': '페픽(유연수)',
         };
 
         function migrateManagerValue(val) {
@@ -2120,6 +2123,25 @@
                         }
                     }
                 });
+            });
+
+            // 같은 날짜에 여러 행이 있을 때, 과정 미선택 빈 행 제거
+            const dateRowMap = {};
+            document.querySelectorAll('#tbody-sem1 tr').forEach(tr => {
+                const di = tr.querySelector('.date-input');
+                if (!di || !di.value) return;
+                if (!dateRowMap[di.value]) dateRowMap[di.value] = [];
+                dateRowMap[di.value].push(tr);
+            });
+            Object.values(dateRowMap).forEach(rows => {
+                if (rows.length <= 1) return;
+                // 같은 날짜에 2개 이상 행이 있으면, 과정 미선택인 행 제거
+                const filledRows = rows.filter(r => r.querySelector('.course-select')?.value);
+                if (filledRows.length > 0) {
+                    rows.forEach(r => {
+                        if (!r.querySelector('.course-select')?.value) r.remove();
+                    });
+                }
             });
 
             window.updateAllocationStatus && window.updateAllocationStatus();
