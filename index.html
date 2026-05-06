@@ -1050,9 +1050,14 @@
             const dateInput = clone.querySelector('.date-input');
             if (dateInput) {
                 dateInput.setAttribute('readonly', 'true');
-                dateInput.classList.add('pointer-events-none', 'opacity-60');
                 dateInput.classList.remove('cursor-pointer');
+                dateInput.style.visibility = 'hidden';
+                dateInput.parentElement.style.position = 'relative';
+                dateInput.parentElement.insertAdjacentHTML('afterbegin', '<span class="dup-dash text-xs text-slate-400 absolute inset-0 flex items-center justify-center">-</span>');
             }
+
+            const dayLabel = clone.querySelector('.day-label');
+            if (dayLabel) dayLabel.textContent = '-';
 
             tr.after(clone);
             window.updateAllocationStatus();
@@ -2125,7 +2130,8 @@
                 });
             });
 
-            // 같은 날짜에 여러 행이 있을 때, 과정 미선택 빈 행 제거
+            // 같은 날짜에 여러 행이 있을 때, 과정 미선택 빈 행 숨기기
+            // 숨긴 후 첫 번째 보이는 행에 날짜/요일을 복원
             const dateRowMap = {};
             document.querySelectorAll('#tbody-sem1 tr').forEach(tr => {
                 const di = tr.querySelector('.date-input');
@@ -2135,12 +2141,53 @@
             });
             Object.values(dateRowMap).forEach(rows => {
                 if (rows.length <= 1) return;
-                // 같은 날짜에 2개 이상 행이 있으면, 과정 미선택인 행 제거
                 const filledRows = rows.filter(r => r.querySelector('.course-select')?.value);
                 if (filledRows.length > 0) {
                     rows.forEach(r => {
-                        if (!r.querySelector('.course-select')?.value) r.remove();
+                        if (!r.querySelector('.course-select')?.value) {
+                            r.style.display = 'none';
+                        }
                     });
+                }
+            });
+
+            // 동적 행의 날짜 opacity 제거 (진한 검정색으로 표시)
+            document.querySelectorAll('#tbody-sem1 .date-input.opacity-60').forEach(el => {
+                el.classList.remove('opacity-60', 'pointer-events-none');
+            });
+
+            // 같은 날짜의 추가 행에서 날짜/요일을 "-"로 표시 (첫 보이는 행에만 실제 날짜 표시)
+            const dateGroupsForDisplay = {};
+            document.querySelectorAll('#tbody-sem1 tr').forEach(tr => {
+                if (tr.style.display === 'none') return; // 숨겨진 행 건너뜀
+                const di = tr.querySelector('.date-input');
+                if (!di || !di.value) return;
+                if (!dateGroupsForDisplay[di.value]) {
+                    dateGroupsForDisplay[di.value] = 0;
+                }
+                dateGroupsForDisplay[di.value]++;
+                if (dateGroupsForDisplay[di.value] === 1) {
+                    // 첫 번째 보이는 행: 날짜/요일 보이게
+                    di.style.visibility = 'visible';
+                    // 기존 dup-dash 제거
+                    const existingDash = di.parentElement.querySelector('.dup-dash');
+                    if (existingDash) existingDash.remove();
+                    const dayLabel = tr.querySelector('.day-label');
+                    if (dayLabel) {
+                        const d = new Date(di.value);
+                        dayLabel.textContent = ['일','월','화','수','목','금','토'][d.getDay()];
+                    }
+                } else {
+                    // 추가 행: "-" 표시
+                    di.style.visibility = 'hidden';
+                    if (!di.parentElement.querySelector('.dup-dash')) {
+                        di.parentElement.style.position = 'relative';
+                        di.parentElement.insertAdjacentHTML('afterbegin', '<span class="dup-dash text-xs text-slate-400 absolute inset-0 flex items-center justify-center">-</span>');
+                    }
+                    const dayLabel = tr.querySelector('.day-label');
+                    if (dayLabel) dayLabel.textContent = '-';
+                    const weekCell = tr.querySelector('.week-cell');
+                    if (weekCell) weekCell.innerHTML = '';
                 }
             });
 
